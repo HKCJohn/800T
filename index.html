@@ -46,6 +46,8 @@
         .feedback-area{background:var(--fb-bg);border-radius:40px;padding:16px 20px;margin:6px 0 20px;text-align:center;border-left:5px solid var(--gold);color:var(--text);}
         .next-btn{background:var(--next-bg);width:100%;border:none;padding:16px;border-radius:60px;font-weight:700;color:white;cursor:pointer;}
         .next-btn:disabled{opacity:0.6;cursor:default;}
+        .prev-btn{background:#6c757d;width:100%;border:none;padding:16px;border-radius:60px;font-weight:700;font-size:1.1rem;color:white;cursor:pointer;margin-bottom:10px;}
+        .prev-btn:disabled{opacity:0.6;cursor:default;}
         .finish-message{background:var(--correct);text-align:center;padding:28px;border-radius:48px;font-weight:bold;color:var(--text);}
         footer{font-size:0.7rem;text-align:center;padding:18px;color:var(--footer);border-top:1px solid var(--border);}
         .notebook-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px 0;}
@@ -70,6 +72,7 @@
         .tiny-theme.color-forest{background:#2e5c3a;}
         .tiny-theme.color-grey{background:#475569;}
         .tiny-theme.color-purple{background:#6d28d9;}
+        .wrongbook-btn{background:#c44f4f;width:100%;border:none;padding:16px;border-radius:60px;font-weight:700;font-size:1.2rem;color:white;cursor:pointer;margin-top:16px;}
     </style>
 </head>
 <body class="theme-default">
@@ -82,15 +85,17 @@
     <div class="option-group"><div class="group-title">🎨 界面风格</div><div class="theme-buttons" id="themeSelectorStart"><div data-theme="default" class="theme-btn active">🌊 清新蓝</div><div data-theme="dark" class="theme-btn">🌙 暗夜</div><div data-theme="warm" class="theme-btn">☀️ 暖阳</div><div data-theme="mint" class="theme-btn">🍃 薄荷</div><div data-theme="pink" class="theme-btn">🌸 樱花</div><div data-theme="ocean" class="theme-btn">💧 海洋</div><div data-theme="forest" class="theme-btn">🌲 森林</div><div data-theme="grey" class="theme-btn">⚪️ 极简</div><div data-theme="purple" class="theme-btn">🟣 紫罗兰</div></div></div>
     <button class="start-btn" id="startGameBtn">✨ 开始学习 ✨</button>
     <button class="notebook-btn" id="openNotebookBtn">📖 单词本 (400词原序)</button>
+    <button class="wrongbook-btn" id="openWrongBookBtn">📕 错题本 (按错误次数排序)</button>
     <footer style="margin-top:20px;">🎧 点击单词发声 · 可选发音人 · 9种主题</footer>
 </div>
 <div id="gameScreen" class="screen hide">
     <div class="stats-bar"><div class="progress-badge" id="progressText">第 1 / ? 词</div><div class="score-badge" id="scoreText">✅ 答对: 0</div><div style="display:flex;gap:8px;"><button class="icon-btn" id="backToHomeBtn">🏠 首页</button><div class="theme-switch-inline" id="inlineThemeSwitcher"><div class="tiny-theme color-default" data-theme="default" title="清新蓝"></div><div class="tiny-theme color-dark" data-theme="dark" title="暗夜星空"></div><div class="tiny-theme color-warm" data-theme="warm" title="暖阳纸页"></div><div class="tiny-theme color-mint" data-theme="mint" title="薄荷轻奢"></div><div class="tiny-theme color-pink" data-theme="pink" title="樱花粉"></div><div class="tiny-theme color-ocean" data-theme="ocean" title="海洋蓝"></div><div class="tiny-theme color-forest" data-theme="forest" title="森林绿"></div><div class="tiny-theme color-grey" data-theme="grey" title="极简灰"></div><div class="tiny-theme color-purple" data-theme="purple" title="紫罗兰"></div></div></div></div>
     <div class="word-area" id="wordClickArea"><div class="english-word" id="currentWord">nature</div><div class="badge-hint">🔊 点击单词 · 聆听发音</div></div>
-    <div class="options-area"><div class="options-grid" id="optionsContainer"></div><div class="feedback-area" id="feedbackMsg">💡 选择一个答案</div><button class="next-btn" id="nextBtn" disabled>➡ 下一单词</button></div>
+    <div class="options-area"><div class="options-grid" id="optionsContainer"></div><div class="feedback-area" id="feedbackMsg">💡 选择一个答案</div><button class="prev-btn" id="prevBtn" disabled>⬅ 上一单词</button><button class="next-btn" id="nextBtn" disabled>➡ 下一单词</button></div>
     <footer>📚 400词完整题库 · 每题随机干扰 · 支持分题库训练</footer>
 </div>
 <div id="notebookScreen" class="screen hide"><div class="notebook-header"><h2>📖 单词本</h2><button class="icon-btn" id="closeNotebookBtn">✕ 关闭</button></div><div id="notebookList" class="notebook-list"></div></div>
+<div id="wrongbookScreen" class="screen hide"><div class="notebook-header"><h2>📕 错题本</h2><button class="icon-btn" id="closeWrongBookBtn">✕ 关闭</button></div><div id="wrongbookList" class="notebook-list"></div></div>
 <script>
 // 完整400词库 (共400个，从用户提供的原始数据整理)
 const rawWordsText = `1. nature n. 自然；天性
@@ -497,24 +502,159 @@ function parseWordList(t){const l=t.split(/\r?\n/),r=[];const e=/^\d+\.\s+([\w\s
 const FULL_WORD_BANK=parseWordList(rawWordsText);console.assert(FULL_WORD_BANK.length===400);
 function getWordsByRange(t){if(t==='all')return[...FULL_WORD_BANK];const e=(parseInt(t)-1)*100;return FULL_WORD_BANK.slice(e,e+100)}
 let currentSequence=[],currentIndex=0,correctCount=0,answered=false,currentOptions=[],currentTheme="default",currentRangeLabel="全部",autoSpeakEnabled=false;let availableVoices=[],selectedVoice=null;
-const startScreen=document.getElementById('startScreen'),gameScreen=document.getElementById('gameScreen'),startBtn=document.getElementById('startGameBtn'),backHomeBtn=document.getElementById('backToHomeBtn'),nextBtn=document.getElementById('nextBtn'),currentWordEl=document.getElementById('currentWord'),wordClickArea=document.getElementById('wordClickArea'),optionsContainer=document.getElementById('optionsContainer'),feedbackMsgDiv=document.getElementById('feedbackMsg'),progressTextSpan=document.getElementById('progressText'),scoreTextSpan=document.getElementById('scoreText'),autoSpeakCheckbox=document.getElementById('autoSpeakCheckbox'),voiceSelect=document.getElementById('voiceSelect'),refreshVoicesBtn=document.getElementById('refreshVoicesBtn'),notebookScreen=document.getElementById('notebookScreen'),openNotebookBtn=document.getElementById('openNotebookBtn'),closeNotebookBtn=document.getElementById('closeNotebookBtn'),notebookList=document.getElementById('notebookList');
+// 新增：错题记录和历史状态记录
+const mistakeMap = new Map();
+let answerHistory = {}; // 改为对象：{ index: { answered, correctCount, options, selectedIndex, feedbackMsg } }
+
+const startScreen=document.getElementById('startScreen'),gameScreen=document.getElementById('gameScreen'),startBtn=document.getElementById('startGameBtn'),backHomeBtn=document.getElementById('backToHomeBtn'),nextBtn=document.getElementById('nextBtn'),prevBtn=document.getElementById('prevBtn'),currentWordEl=document.getElementById('currentWord'),wordClickArea=document.getElementById('wordClickArea'),optionsContainer=document.getElementById('optionsContainer'),feedbackMsgDiv=document.getElementById('feedbackMsg'),progressTextSpan=document.getElementById('progressText'),scoreTextSpan=document.getElementById('scoreText'),autoSpeakCheckbox=document.getElementById('autoSpeakCheckbox'),voiceSelect=document.getElementById('voiceSelect'),refreshVoicesBtn=document.getElementById('refreshVoicesBtn'),notebookScreen=document.getElementById('notebookScreen'),openNotebookBtn=document.getElementById('openNotebookBtn'),closeNotebookBtn=document.getElementById('closeNotebookBtn'),notebookList=document.getElementById('notebookList'),wrongbookScreen=document.getElementById('wrongbookScreen'),openWrongBookBtn=document.getElementById('openWrongBookBtn'),closeWrongBookBtn=document.getElementById('closeWrongBookBtn'),wrongbookList=document.getElementById('wrongbookList');
 function speakWord(t){if(!t)return;if(window.speechSynthesis){window.speechSynthesis.cancel();const e=new SpeechSynthesisUtterance(t);e.lang='en-US';if(selectedVoice)e.voice=selectedVoice;e.rate=0.9;window.speechSynthesis.speak(e)}}
 function populateVoiceList(){if(!voiceSelect)return;voiceSelect.innerHTML='';const t=availableVoices.filter(t=>t.lang.startsWith('en'));const e=t.length?t:availableVoices;if(e.length===0){const t=document.createElement('option');t.textContent='等待语音加载...';voiceSelect.appendChild(t);return}e.forEach(t=>{const e=document.createElement('option');e.value=t.name;e.textContent=`${t.name} (${t.lang})`;if(selectedVoice&&selectedVoice.name===t.name)e.selected=true;voiceSelect.appendChild(e)});if(!selectedVoice&&e.length){selectedVoice=e[0];voiceSelect.value=selectedVoice.name}}
 function loadVoices(){return new Promise((t)=>{let e=window.speechSynthesis.getVoices();if(e.length){availableVoices=e;populateVoiceList();t()}else{window.speechSynthesis.onvoiceschanged=()=>{availableVoices=window.speechSynthesis.getVoices();populateVoiceList();t()}}setTimeout(()=>{if(availableVoices.length===0){availableVoices=window.speechSynthesis.getVoices()||[];populateVoiceList();t()}},1500)})}
 voiceSelect?.addEventListener('change',()=>{const t=availableVoices.find(t=>t.name===voiceSelect.value);if(t)selectedVoice=t});refreshVoicesBtn?.addEventListener('click',()=>{loadVoices();feedbackMsgDiv.innerHTML='🔄 正在刷新语音列表...';setTimeout(()=>{feedbackMsgDiv.innerHTML='🤔 选择一个释义～';},1500)});
 function getRandomDistractors(t){const e=new Set([t]),l=[];for(let t=0;t<FULL_WORD_BANK.length&&l.length<50;t++){const a=FULL_WORD_BANK[t].zh;if(!e.has(a)){e.add(a);l.push(a)}}for(let t=l.length-1;t>0;t--){const e=Math.floor(Math.random()*(t+1));[l[t],l[e]]=[l[e],l[t]]}return l.slice(0,3)}
 function generateOptions(t){const e=getRandomDistractors(t);let l=[{text:t,isCorrect:true},...e.map(t=>({text:t,isCorrect:false}))];for(let t=l.length-1;t>0;t--){const e=Math.floor(Math.random()*(t+1));[l[t],l[e]]=[l[e],l[t]]}return l}
-function renderGame(){if(currentIndex>=currentSequence.length){currentWordEl.innerText="🎉 通关 🎉";optionsContainer.innerHTML=`<div class="finish-message">✨ 恭喜你完成了 ${currentRangeLabel} 题库！ ✨<br>点击「首页」可以选择其他范围继续挑战</div>`;nextBtn.disabled=true;feedbackMsgDiv.innerHTML="🏆 太棒了！继续挑战新题库吧～";progressTextSpan.innerText=`完成 ${currentSequence.length} / ${currentSequence.length}`;return}const t=currentSequence[currentIndex];currentWordEl.innerText=t.en;currentOptions=generateOptions(t.zh);optionsContainer.innerHTML='';currentOptions.forEach(t=>{const e=document.createElement('button');e.className='option-btn';e.innerText=t.text;e.dataset.correct=t.isCorrect;e.addEventListener('click',()=>handleAnswer(e,t.isCorrect));optionsContainer.appendChild(e)});progressTextSpan.innerText=`${currentRangeLabel} · 第 ${currentIndex+1} / ${currentSequence.length} 词`;scoreTextSpan.innerText=`✅ 答对: ${correctCount}`;feedbackMsgDiv.innerHTML='🤔 选择一个释义～';answered=false;nextBtn.disabled=true;if(autoSpeakEnabled&&currentIndex<currentSequence.length){speakWord(t.en)}}
-function handleAnswer(t,e){if(answered){feedbackMsgDiv.innerHTML='⚠️ 已经作答，进入下一题吧';return}answered=true;const l=document.querySelectorAll('.option-btn');l.forEach(l=>{l.disabled=true;if(l.dataset.correct==='true')l.classList.add('correct-highlight');if(l===t&&!e)l.classList.add('wrong-highlight')});if(e){correctCount++;scoreTextSpan.innerText=`✅ 答对: ${correctCount}`;feedbackMsgDiv.innerHTML=`🎉 正确！ “${currentSequence[currentIndex].zh}” 很棒！`;}else{feedbackMsgDiv.innerHTML=`❌ 错误！ 正确答案是 “${currentSequence[currentIndex].zh}”。继续加油～`;}nextBtn.disabled=false}
-function nextWord(){if(!answered&&currentIndex<currentSequence.length){feedbackMsgDiv.innerHTML='📢 请先回答当前单词';return}if(currentIndex>=currentSequence.length)return;currentIndex++;renderGame()}
+function renderGame(){
+    if(currentIndex>=currentSequence.length){
+        currentWordEl.innerText="🎉 通关 🎉";
+        optionsContainer.innerHTML=`<div class="finish-message">✨ 恭喜你完成了 ${currentRangeLabel} 题库！ ✨<br>点击「首页」可以选择其他范围继续挑战</div>`;
+        nextBtn.disabled=true;
+        prevBtn.disabled=false;
+        feedbackMsgDiv.innerHTML="🏆 太棒了！继续挑战新题库吧～";
+        progressTextSpan.innerText=`完成 ${currentSequence.length} / ${currentSequence.length}`;
+        return;
+    }
+    
+    const t=currentSequence[currentIndex];
+    currentWordEl.innerText=t.en;
+    
+    // 检查是否有该题的历史状态
+    const history = answerHistory[currentIndex];
+    
+    if(history && history.options) {
+        // 恢复历史状态
+        currentOptions = history.options;
+        answered = history.answered;
+        if(history.correctCount !== undefined) {
+            correctCount = history.correctCount;
+        }
+    } else {
+        // 生成新题目
+        currentOptions = generateOptions(t.zh);
+        answered = false;
+    }
+    
+    optionsContainer.innerHTML='';
+    currentOptions.forEach((opt, optIndex) => {
+        const e=document.createElement('button');
+        e.className='option-btn';
+        e.innerText=opt.text;
+        e.dataset.correct=opt.isCorrect;
+        e.dataset.index=optIndex;
+        
+        // 如果已经答过，恢复高亮状态
+        if(history && history.answered) {
+            e.disabled=true;
+            if(opt.isCorrect) {
+                e.classList.add('correct-highlight');
+            }
+            if(history.selectedOptionIndex === optIndex && !opt.isCorrect) {
+                e.classList.add('wrong-highlight');
+            }
+        } else {
+            e.addEventListener('click',()=>handleAnswer(e,opt.isCorrect, optIndex));
+        }
+        
+        optionsContainer.appendChild(e);
+    });
+    
+    progressTextSpan.innerText=`${currentRangeLabel} · 第 ${currentIndex+1} / ${currentSequence.length} 词`;
+    scoreTextSpan.innerText=`✅ 答对: ${correctCount}`;
+    
+    if(history && history.answered) {
+        feedbackMsgDiv.innerHTML = history.feedbackMsg || '🤔 选择一个释义～';
+        nextBtn.disabled = false;
+    } else {
+        feedbackMsgDiv.innerHTML='🤔 选择一个释义～';
+        nextBtn.disabled=true;
+    }
+    
+    prevBtn.disabled=(currentIndex===0);
+    
+    if(autoSpeakEnabled&&currentIndex<currentSequence.length){
+        speakWord(t.en);
+    }
+}
+
+function handleAnswer(t,isCorrect, optIndex){
+    if(answered){
+        feedbackMsgDiv.innerHTML='⚠️ 已经作答，进入下一题吧';
+        return;
+    }
+    answered=true;
+    
+    const wordEn = currentSequence[currentIndex].en;
+    const wordZh = currentSequence[currentIndex].zh;
+    
+    const l=document.querySelectorAll('.option-btn');
+    l.forEach(l=>{
+        l.disabled=true;
+        if(l.dataset.correct==='true')l.classList.add('correct-highlight');
+        if(parseInt(l.dataset.index)===optIndex && !isCorrect)l.classList.add('wrong-highlight');
+    });
+    
+    let feedbackText = '';
+    if(isCorrect){
+        correctCount++;
+        scoreTextSpan.innerText=`✅ 答对: ${correctCount}`;
+        feedbackText=`🎉 正确！ "${wordZh}" 很棒！`;
+    }else{
+        // 记录错题
+        mistakeMap.set(wordEn, (mistakeMap.get(wordEn) || 0) + 1);
+        feedbackText=`❌ 错误！ 正确答案是 "${wordZh}"。继续加油～`;
+    }
+    
+    feedbackMsgDiv.innerHTML = feedbackText;
+    nextBtn.disabled=false;
+    
+    // 保存完整状态到历史记录
+    answerHistory[currentIndex] = {
+        answered: true,
+        correctCount: correctCount,
+        options: currentOptions,
+        selectedOptionIndex: optIndex,
+        feedbackMsg: feedbackText,
+        word: currentSequence[currentIndex]
+    };
+}
+
+function nextWord(){
+    if(!answered&&currentIndex<currentSequence.length){
+        feedbackMsgDiv.innerHTML='📢 请先回答当前单词';
+        return;
+    }
+    if(currentIndex>=currentSequence.length)return;
+    currentIndex++;
+    renderGame();
+}
+
+function prevWord(){
+    if(currentIndex>0){
+        currentIndex--;
+        renderGame();
+    }
+}
+
 function applyTheme(t){document.body.classList.remove('theme-default','theme-dark','theme-warm','theme-mint','theme-pink','theme-ocean','theme-forest','theme-grey','theme-purple');document.body.classList.add(`theme-${t}`);currentTheme=t;document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(e=>{if(e.dataset.theme===t)e.classList.add('active');else e.classList.remove('active')})}
-function startGame(){const t=document.querySelector('#quizRangeSelector .quiz-btn.active');let e=t?t.dataset.range:'all';const l=document.querySelectorAll('input[name="order"]');let a='original';for(let t of l)if(t.checked){a=t.value;break}let o=getWordsByRange(e);if(o.length===0)o=[...FULL_WORD_BANK];if(e==='all')currentRangeLabel='全部题库 (1-400)';else if(e==='1')currentRangeLabel='题库1 (1-100)';else if(e==='2')currentRangeLabel='题库2 (101-200)';else if(e==='3')currentRangeLabel='题库3 (201-300)';else if(e==='4')currentRangeLabel='题库4 (301-400)';if(a==='random'){for(let t=o.length-1;t>0;t--){const e=Math.floor(Math.random()*(t+1));[o[t],o[e]]=[o[e],o[t]]}}currentSequence=o;currentIndex=0;correctCount=0;answered=false;autoSpeakEnabled=autoSpeakCheckbox?autoSpeakCheckbox.checked:false;renderGame();startScreen.classList.add('hide');gameScreen.classList.remove('hide')}
+function startGame(){const t=document.querySelector('#quizRangeSelector .quiz-btn.active');let e=t?t.dataset.range:'all';const l=document.querySelectorAll('input[name="order"]');let a='original';for(let t of l)if(t.checked){a=t.value;break}let o=getWordsByRange(e);if(o.length===0)o=[...FULL_WORD_BANK];if(e==='all')currentRangeLabel='全部题库 (1-400)';else if(e==='1')currentRangeLabel='题库1 (1-100)';else if(e==='2')currentRangeLabel='题库2 (101-200)';else if(e==='3')currentRangeLabel='题库3 (201-300)';else if(e==='4')currentRangeLabel='题库4 (301-400)';if(a==='random'){for(let t=o.length-1;t>0;t--){const e=Math.floor(Math.random()*(t+1));[o[t],o[e]]=[o[e],o[t]]}}currentSequence=o;currentIndex=0;correctCount=0;answered=false;answerHistory={};autoSpeakEnabled=autoSpeakCheckbox?autoSpeakCheckbox.checked:false;renderGame();startScreen.classList.add('hide');gameScreen.classList.remove('hide')}
 function backToStart(){gameScreen.classList.add('hide');startScreen.classList.remove('hide');window.speechSynthesis&&window.speechSynthesis.cancel()}
 function renderNotebook(){if(!notebookList)return;notebookList.innerHTML='';FULL_WORD_BANK.forEach((t,e)=>{const l=document.createElement('div');l.className='notebook-item';l.innerHTML=`<div class="notebook-left"><span class="notebook-num">${e+1}</span><span class="notebook-en">${t.en}</span></div><span class="notebook-zh">${t.zh}</span>`;l.addEventListener('click',()=>speakWord(t.en));notebookList.appendChild(l)})}
+function renderWrongbook(){if(!wrongbookList)return;wrongbookList.innerHTML='';const sorted = [...mistakeMap.entries()].sort((a,b) => b[1] - a[1]);if(sorted.length===0){wrongbookList.innerHTML='<div style="padding:24px;text-align:center;color:var(--footer);">暂无错题记录，继续加油！</div>';return}sorted.forEach(([enWord, count])=>{const wordObj = FULL_WORD_BANK.find(w=>w.en===enWord);const zh = wordObj?wordObj.zh:'';const l=document.createElement('div');l.className='notebook-item';l.innerHTML=`<div class="notebook-left"><span class="notebook-num" style="color:#c44f4f;font-weight:bold;">${count}次</span><span class="notebook-en">${enWord}</span></div><span class="notebook-zh">${zh}</span>`;l.addEventListener('click',()=>speakWord(enWord));wrongbookList.appendChild(l)})}
 function openNotebook(){startScreen.classList.add('hide');gameScreen.classList.add('hide');notebookScreen.classList.remove('hide');if(notebookList.children.length===0)renderNotebook()}
 function closeNotebook(){notebookScreen.classList.add('hide');startScreen.classList.remove('hide');window.speechSynthesis&&window.speechSynthesis.cancel()}
+function openWrongbook(){startScreen.classList.add('hide');gameScreen.classList.add('hide');wrongbookScreen.classList.remove('hide');renderWrongbook()}
+function closeWrongbook(){wrongbookScreen.classList.add('hide');startScreen.classList.remove('hide');window.speechSynthesis&&window.speechSynthesis.cancel()}
 document.querySelectorAll('#quizRangeSelector .quiz-btn').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('#quizRangeSelector .quiz-btn').forEach(t=>t.classList.remove('active'));t.classList.add('active')})});
-startBtn.addEventListener('click',startGame);backHomeBtn.addEventListener('click',backToStart);nextBtn.addEventListener('click',nextWord);wordClickArea.addEventListener('click',()=>{if(currentIndex<currentSequence.length&&currentSequence[currentIndex])speakWord(currentSequence[currentIndex].en)});openNotebookBtn?.addEventListener('click',openNotebook);closeNotebookBtn?.addEventListener('click',closeNotebook);
+startBtn.addEventListener('click',startGame);backHomeBtn.addEventListener('click',backToStart);nextBtn.addEventListener('click',nextWord);prevBtn.addEventListener('click',prevWord);wordClickArea.addEventListener('click',()=>{if(currentIndex<currentSequence.length&&currentSequence[currentIndex])speakWord(currentSequence[currentIndex].en)});openNotebookBtn?.addEventListener('click',openNotebook);closeNotebookBtn?.addEventListener('click',closeNotebook);openWrongBookBtn?.addEventListener('click',openWrongbook);closeWrongBookBtn?.addEventListener('click',closeWrongbook);
 document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(t=>{t.addEventListener('click',()=>{applyTheme(t.dataset.theme)})});document.querySelectorAll('#inlineThemeSwitcher .tiny-theme').forEach(t=>{t.addEventListener('click',()=>{applyTheme(t.dataset.theme)})});
 applyTheme('default');loadVoices();
 </script>
