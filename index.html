@@ -139,70 +139,6 @@
             --match-paired: #1e4a2e;
             --match-hover: #404040;
         }
-        body.theme-deepforest {
-            --bg-start: #0b1a0f;
-            --bg-end: #152b16;
-            --card: #122014;
-            --header: #071107;
-            --header-text: #cde5d0;
-            --progress: #2b4c2b;
-            --gold: #b0c94e;
-            --word-start: #76b87c;
-            --word-end: #4e8c53;
-            --opt-bg: #1e311f;
-            --border: #345936;
-            --opt-hover: #284129;
-            --correct: #1d3d1d;
-            --correct-border: #81c784;
-            --wrong: #4d2a2a;
-            --wrong-border: #ef9a9a;
-            --fb-bg: #0d180f;
-            --next-bg: #3c6b3e;
-            --shadow: rgba(0, 0, 0, 0.6);
-            --text: #d4efd7;
-            --footer: #82a685;
-            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            --list-border: #345936;
-            --tiny-border: rgba(255, 255, 255, 0.35);
-            --tiny-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-            --match-card-bg: #122014;
-            --match-card-border: #345936;
-            --match-selected: #b0c94e;
-            --match-paired: #1d3d1d;
-            --match-hover: #284129;
-        }
-        body.theme-aubergine {
-            --bg-start: #1b1126;
-            --bg-end: #2a1c3a;
-            --card: #21182c;
-            --header: #110b19;
-            --header-text: #e0d0f0;
-            --progress: #4a3b5e;
-            --gold: #d4b8e0;
-            --word-start: #b794f4;
-            --word-end: #9a6dd7;
-            --opt-bg: #312640;
-            --border: #524665;
-            --opt-hover: #403550;
-            --correct: #283d28;
-            --correct-border: #81c784;
-            --wrong: #4e2121;
-            --wrong-border: #ef9a9a;
-            --fb-bg: #191122;
-            --next-bg: #6e4e8c;
-            --shadow: rgba(0, 0, 0, 0.5);
-            --text: #e8dcf5;
-            --footer: #b09dc7;
-            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            --list-border: #524665;
-            --tiny-border: rgba(255, 255, 255, 0.4);
-            --tiny-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            --match-card-bg: #21182c;
-            --match-card-border: #524665;
-            --match-selected: #d4b8e0;
-            --match-paired: #283d28;
-            --match-hover: #403550;
-        }
         body.theme-whitepink {
             --bg-start: #fff0f5;
             --bg-end: #ffe4ed;
@@ -589,18 +525,13 @@
         .tiny-theme.color-charcoal {
             background: #5a5a5a;
         }
-        .tiny-theme.color-deepforest {
-            background: #3c6b3e;
-        }
-        .tiny-theme.color-aubergine {
-            background: #6e4e8c;
-        }
         .tiny-theme.color-whitepink {
             background: #f08fa5;
         }
         .tiny-theme.color-whitegreen {
             background: #7baa7b;
         }
+
         .wrongbook-btn {
             background: #c44f4f;
             width: 100%;
@@ -742,15 +673,13 @@
 </head>
 <body class="theme-default">
     <div id="startScreen" class="screen start-card">
-        <div class="logo">📚 背词器 · 400词</div>
-        <div class="sub">400词全收录 · 可选发音人 · 自动朗读</div>
+        <div class="logo">📚 背词器</div>
+        <div class="sub">题库4 + U8单元 · 可选发音人 · 自动朗读</div>
         <div class="option-group">
             <div class="group-title">📖 选择题库范围</div>
             <div class="quiz-buttons" id="quizRangeSelector">
-                <div data-range="1" class="quiz-btn active">📘 题库1 (1-100)</div>
-                <div data-range="2" class="quiz-btn">📙 题库2 (101-200)</div>
-                <div data-range="3" class="quiz-btn">📕 题库3 (201-300)</div>
-                <div data-range="4" class="quiz-btn">📗 题库4 (301-400)</div>
+                <div data-range="4" class="quiz-btn active">📗 题库4 (301-400)</div>
+                <div data-range="u8" class="quiz-btn">📒 U8 单元</div>
             </div>
         </div>
         <div class="option-group">
@@ -783,10 +712,8 @@
         <div class="option-group">
             <div class="group-title">📖 单词本范围</div>
             <div class="quiz-buttons" id="notebookRangeSelector">
-                <div data-range="1" class="quiz-btn active">题库1</div>
-                <div data-range="2" class="quiz-btn">题库2</div>
-                <div data-range="3" class="quiz-btn">题库3</div>
-                <div data-range="4" class="quiz-btn">题库4</div>
+                <div data-range="4" class="quiz-btn active">题库4</div>
+                <div data-range="u8" class="quiz-btn">U8</div>
             </div>
         </div>
         <div class="option-group">
@@ -798,14 +725,12 @@
                 <div data-theme="whitepink" class="theme-btn">🌸 白粉</div>
                 <div data-theme="whitegreen" class="theme-btn">🌿 白绿</div>
                 <div data-theme="charcoal" class="theme-btn">🖤 炭灰</div>
-                <div data-theme="deepforest" class="theme-btn">🌲 深林</div>
-                <div data-theme="aubergine" class="theme-btn">🍆 暗紫</div>
             </div>
         </div>
         <button class="start-btn" id="startGameBtn">✨ 开始学习 ✨</button>
         <button class="notebook-btn" id="openNotebookBtn">📖 单词本</button>
         <button class="wrongbook-btn" id="openWrongBookBtn">📕 错题本 (按错误次数排序)</button>
-        <footer style="margin-top:20px;">🎧 点击单词发声 · 8种主题 · 错词总结 · 400词题库 · 配对模式</footer>
+        <footer style="margin-top:20px;">🎧 点击单词发声 · 6种主题 · 错词总结 · 题库4 + U8 · 配对模式</footer>
     </div>
 
     <div id="gameScreen" class="screen hide">
@@ -821,8 +746,6 @@
                     <div class="tiny-theme color-whitepink" data-theme="whitepink" title="白粉"></div>
                     <div class="tiny-theme color-whitegreen" data-theme="whitegreen" title="白绿"></div>
                     <div class="tiny-theme color-charcoal" data-theme="charcoal" title="炭灰"></div>
-                    <div class="tiny-theme color-deepforest" data-theme="deepforest" title="深林"></div>
-                    <div class="tiny-theme color-aubergine" data-theme="aubergine" title="暗紫"></div>
                 </div>
             </div>
         </div>
@@ -855,7 +778,7 @@
                 <button class="next-btn" id="matchNextBtn" disabled>➡ 下一回合</button>
             </div>
         </div>
-        <footer>📚 400词完整题库 · 每题随机干扰 · 支持分题库训练 · 配对模式</footer>
+        <footer>📚 题库4 (301-400) + U8单元 · 支持分题库训练 · 配对模式</footer>
     </div>
 
     <div id="notebookScreen" class="screen hide">
@@ -874,307 +797,7 @@
     </div>
     <script>
         (function() {
-            const rawWordsText = `1. nature n. 自然；天性
-2. being n. 生物；人
-3. play n. 戏剧；短剧
-4. inform v. 告知；通知
-5. effect n. 效果；作用
-6. offer n.&v. 提供；提议
-7. means n. 方法
-8. book n./v. 书籍；预约；预订
-9. social adj. 爱交际的
-10. support n.&v. 支持
-11. system n. 系统
-12. suggest v. 提议；建议
-13. anxious adj. 忧虑的；担心的
-14. likely adj. 有可能的
-15. present v. 介绍；提出；呈现
-16. site n. 位置；场所
-17. power n. 权力；影响力
-18. certain adj. 某种；某些
-19. guidance n. 指导
-20. benefit n.&v. 得益；好处
-21. case n. 大箱子
-22. stop n. 终止；停止
-23. purpose n. 目的；意图
-24. design n.&v. 设计
-25. base n./v. 基地；基础；以…为基础
-26. personal adj. 私人的；个人的
-27. gain v. 获得；增加
-28. treat v. 款待
-29. project n. 计划；工程
-30. quit v. 停止；辞职
-31. risk v. 冒……的危险
-32. comfort n.&v. 舒适；安逸
-33. stress n.&v. 压力
-34. challenge n.&v. 挑战
-35. process n. 过程；进程
-36. include v. 包括；包含
-37. writer n. 作者；作家
-38. type n. 类型；种类
-39. shopping n. 购物
-40. ordinary adj. 平常的；普通的
-41. reduce v. 减少；使处于
-42. title n. 标题；题目
-43. physical adj. 身体的；物质的
-44. attitude n. 态度；看法
-45. harm n. 伤害；损害
-46. govern v. 统治；治理
-47. million num.&adj. 百万；百万的
-48. thinking n. 思考；思想
-49. as well phr. 也
-50. affect v. 影响
-51. matter n. 物质
-52. prefer v. 更喜欢；宁愿
-53. approach n. 方法；方式；v. 靠近
-54. lack n.&v. 缺乏
-55. arm n.&v. 武装
-56. opinion n. 意见；看法；主张
-57. actually adv. 实际地；真实地
-58. desire n. 渴望；欲望；v. 想要
-59. loss n. 遗失；丢失
-60. mess n. 混乱；脏乱
-61. tear n. 眼泪；v. 流泪；撕
-62. quality n. 质量；品质
-63. tradition n. 传统；惯例
-64. present n. 礼物
-65. positive adj. 积极的
-66. excite v. 使兴奋
-67. character n. 人物；性格
-68. pack v. 收拾；打包
-69. character n. 字体
-70. profession n. 职业；专业
-71. diet n. 饮食；节食
-72. view n. 景色；风景
-73. teenager n. 十几岁的青少年
-74. equip v. 使有准备；配备；装备
-75. adult n. 成年人
-76. within prep. 在…之内
-77. charge n. 费用；v. 使充电
-78. deer n. 鹿
-79. attack n. 进攻；攻击
-80. pressure n. 压力
-81. hug n.&v. 拥抱
-82. digital adj. 数字式的
-83. impress v. 使（人）印象深刻
-84. saying n. 格言；谚语
-85. equipment n. 配备；设备
-86. respect n.&v. 尊敬；尊重
-87. treat v. 对待
-88. potential n. 潜力；可能性
-89. stage n. 舞台；阶段；时期
-90. now that phr. 既然；由于
-91. seek v. 寻找
-92. matter n.&v. 要紧；有重大关系
-93. perform v. 表演；做
-94. anxiety n. 忧虑；担心
-95. instruct v. 指导；教导
-96. relationship n. 关系
-97. focus v. 集中注意
-98. disappoint v. 使失望
-99. volunteer n. 志愿者
-100. fashion n. 时髦；时尚
-101. key n. 琴键；答案
-102. traditional adj. 传统的
-103. extreme adj. 极度的；极端的
-104. argue v. 争辩；争吵
-105. damage n.&v. 损害；损失
-106. reward n. 报答；酬谢；v. 奖赏
-107. childhood n. 童年；儿童时代
-108. fine n.&v. 罚款
-109. escape n.&v. 逃跑；逃亡
-110. schedule n. 时间表；进度表
-111. mental adj. 脑力的；精神的
-112. calm adj. 镇静的；沉着的
-113. career n. 职业
-114. recover v. 痊愈；康复
-115. strength n. 长处；优势
-116. responsibility n. 负责；责任
-117. argument n. 论证；论据；争吵
-118. receipt n. 收据；收条
-119. ignore v. 忽视；不顾
-120. origin n. 起源；开端；出身
-121. complex adj. 复杂的
-122. species n. (动植物的) 物种
-123. suffer v. 遭受 (痛苦)
-124. performance n. 表演；演奏
-125. media n. 大众传媒
-126. drop v. 滴下；落下
-127. emotion n. 情感；情绪
-128. cancer n. 癌症
-129. struggle n.&v. 斗争；拼搏
-130. happiness n. 幸福；快乐
-131. dive v. 潜水；跳水
-132. beyond prep. 超出
-133. cell n. 细胞
-134. inspire v. 鼓舞；鼓励
-135. community n. 社区
-136. pain n. 痛苦；疼；痛
-137. select v. 挑选
-138. ray n. 光线
-139. style n. 风格；作风
-140. equal adj. 平等的
-141. react v. 反应
-142. average adj. 平均的
-143. extremely adv. 极端地；非常地
-144. goods n. 货物；商品；财产
-145. demand n.&v. 要求；请求
-146. block n. 大厦；街区
-147. reflect v. 反映；反射
-148. stand n. 立场；v. 站立；忍受
-149. solve v. 解答；解决
-150. explore v. 探险
-151. raft n. 木排；木筏
-152. admit v. 承认；供认
-153. user n. 使用者
-154. concern n.&v. 担心；担忧
-155. involve v. 涉及；参与
-156. growth n. 生长
-157. obvious adj. 明显的
-158. guide n. 导游；指南
-159. detail n. 细节；详情
-160. statement n. 声明；陈述；叙述
-161. professor n. 教授
-162. failure n. 失败
-163. correction n. 改正；改进
-164. gather v. 聚集
-165. generation n. 代；一代
-166. bicycle n. 自行车
-167. per prep. 每；每一
-168. scene n. 场面；场景
-169. image n. 景象；形象
-170. scare v. 使恐惧
-171. confident adj. 自信的
-172. talent n. 天才；才干
-173. replace v. 代替；取代
-174. construct v. 建造
-175. hearing n. 听觉
-176. graduate n.&v. 毕业
-177. wave n.&v. 波浪；挥手
-178. scientific adj. 科学的
-179. award n. 奖；奖品
-180. creative adj. 有创造力的
-181. collection n. 收集；收取
-182. figure n. 数字；数目；人物
-183. evidence n. 证明；证据
-184. advertise v. 登广告
-185. personality n. 个性；性格
-186. respond n.&v. 回复；回答
-187. tease v. 嘲笑；取笑
-188. negative adj. 消极的
-189. sentence n. 判决
-190. provided conj. 如果；条件是
-191. bored adj. 厌烦的
-192. amazing adj. 令人惊异的
-193. admire v. 钦佩；羡慕
-194. opportunity n. 机会
-195. further adj.&adv. 更远的（地）
-196. conclude v. 结束；作出结论
-197. addition n. 相加；增加物
-198. chain n. 链条；连串的事物
-199. deliver v. 递送；传送
-200. recommend v. 推荐；介绍
-201. guarantee v. 保证
-202. unusual adj. 不平常的
-203. attend v. 出席；参加
-204. disappear v. 消失
-205. judge n. 法官；v. 判断；审判
-206. distance n. 距离
-207. destroy v. 破坏；毁坏
-208. as if phr. 好像；仿佛
-209. material n. 材料；原料
-210. expression n. 表情；表达能力
-211. specific adj. 详细的；特定的
-212. security n. 安全
-213. disaster n. 灾难
-214. give up phr. 放弃
-215. appearance n. 外貌；外观
-216. valuable adj. 贵重的
-217. various adj. 各种各样的
-218. thus adv.&conj. 如此；因此
-219. section n. 部分
-220. appointment n. 约见；约会
-221. due to phr. 由于
-222. relative n. 亲戚；亲属
-223. disabled adj. 残废的
-224. nuclear adj. 原子核的
-225. regular adj. 定期的
-226. belief n. 信仰；信心；信任
-227. confirm v. 确认；确定；证实
-228. tough adj. 艰难的；不幸的
-229. lead to phr. 引起；导致
-230. surround v. 环绕；围绕
-231. embarrass v. 使窘迫
-232. crowd n. 人群；v. 拥挤
-233. frequent adj. 时常发生的
-234. ahead adj. 在前面
-235. assignment n. 作业；任务
-236. access n. 接近；通道；v. 进入
-237. urge v. 催促；强烈要求
-238. scared adj. 惊恐的
-239. trap n. 陷阱；v. 诱捕；使困住
-240. employ v. 采用；雇用
-241. adopt v. 采用
-242. fold v. 折叠；交叉
-243. theory n. 理论；学说
-244. colleague n. 同事；同僚
-245. rate n. 比率
-246. suggestion n. 建议；提醒
-247. audience n. 听众；观众
-248. unique adj. 独特的；唯一的
-249. lecture n.&v. 讲课；讲座；演讲
-250. parking n. 停车场
-251. willing adj. 愿意的；乐意的
-252. harmful adj. 有害的
-253. broken adj. 断的；破的
-254. income n. 收入
-255. response n. 回答
-256. invest v. 投资
-257. compete v. 比赛；竞争
-258. event n. 竞赛；事件
-259. promote v. 促进；提升
-260. pillow n. 枕头
-261. attractive adj. 吸引人的
-262. responsible adj. 负责任的
-263. imagination n. 想像；想像力
-264. sign n. 迹象；手势；v. 签署
-265. attract v. 吸引
-266. fuel n. 燃料
-267. environmental adj. 自然环境的
-268. expert n. 专家；adj. 熟练的
-269. organize v. 组织
-270. advertisement n. 广告
-271. represent v. 代表
-272. concrete n. 混凝土
-273. onto prep. 到 (在)…… 上
-274. fiction n. 小说；虚构的事
-275. file n. 档案；文件
-276. account n. 账户；账单；v. 认为
-277. devote v. 奉献(时间/精力等)；献身于
-278. pump n. 泵；v. 打气
-279. particularly adv. 特别地；特定地
-280. recycle n.&v. 回收利用
-281. despite prep. 不管
-282. contribute v. 捐献；贡献
-283. seriously adv. 认真地；真诚地
-284. artist n. 艺术家；画家
-285. confuse v. 使混乱；使困惑
-286. patience n. 耐心；容忍
-287. truly adv. 准确地；真正地
-288. independent adj. 独立的
-289. eager adj. 渴望的；热衷的
-290. refer v. 查阅；提到；涉及
-291. software n. 软件
-292. tight adj. 绷紧的
-293. purchase n.&v. 购买
-294. retire n.&v. 退休
-295. application n. 申请（书）；应用
-296. previous adj. 以前的
-297. sharp adj. 敏锐的；锋利的
-298. upset adj. 不安的；不快的
-299. button n. 钮扣
-300. slight adj. 少量的；微小的
-301. tattoo n. 纹身
+            const rawWordsText = `301. tattoo n. 纹身
 302. adjust v. 调节；调整
 303. emotional adj. 感情的
 304. nearby adj.&prep. (在) 附近的
@@ -1274,19 +897,71 @@
 398. function n. 功能；v. 运行；活动
 399. appreciate v. 欣赏；鉴赏；感激
 400. customer n. 顾客`;
-            const FULL_WORD_BANK = (function(t) {
+
+            function parseWordList(t) {
                 const l = t.split(/\r?\n/),
                     r = [];
                 const e = /^\d+\.\s+([\w\s&’'-]+?)\s+(?:[a-z]+\.(?:&[a-z]+\.)?|n\.\/v\.|phr\.|adj\.|adv\.|prep\.|conj\.|num\.|pron\.|v\.|n\.)\s+(.+)$/i;
                 for (let t of l) { t = t.trim(); if (!t) continue; const l = t.match(e); if (l) r.push({ en: l[1].trim(), zh: l[
-                            2
-                        ].trim() }); else { const e = t.split(/\.\s+/); if (e.length >= 2) { let l = e.slice(1).join('.'); let a =
+                            2].trim() }); else { const e = t.split(/\.\s+/); if (e.length >= 2) { let l = e.slice(1).join('.'); let a =
                             l.split(/\s+(?:n\.|v\.|adj\.|adv\.|prep\.|phr\.|conj\.|num\.)/)[0]; let o = l.replace(
                             /^[a-z&./]+?\s+/, ''); a && o && r.push({ en: a.trim(), zh: o.trim() }) } } }
-                return r
-            })(rawWordsText);
+                return r;
+            }
 
-            function getWordsByRange(t) { const e = (parseInt(t) - 1) * 100; return FULL_WORD_BANK.slice(e, e + 100) }
+            const FULL_WORD_BANK = parseWordList(rawWordsText);
+
+            const U8_WORDS = [
+                { en: "indigenous", zh: "原住民的" },
+                { en: "endangered", zh: "濒临灭绝的" },
+                { en: "disappear", zh: "消失" },
+                { en: "survive", zh: "生存；存活" },
+                { en: "root", zh: "根源；起源" },
+                { en: "nomadic", zh: "游牧的" },
+                { en: "nomad", zh: "游牧民族" },
+                { en: "ancestor", zh: "祖先" },
+                { en: "destroy", zh: "摧毁；破坏" },
+                { en: "unique", zh: "独特的；唯一的" },
+                { en: "trust", zh: "信任" },
+                { en: "near", zh: "接近；靠近" },
+                { en: "population", zh: "人口" },
+                { en: "predict", zh: "预测" },
+                { en: "refuse", zh: "拒绝" },
+                { en: "clinic", zh: "诊所" },
+                { en: "respect", zh: "尊重" },
+                { en: "support", zh: "支持" },
+                { en: "moving", zh: "感人的；令人动容的" },
+                { en: "overview", zh: "概述；总览" },
+                { en: "land", zh: "登陆；降落" },
+                { en: "ecotour", zh: "生态旅游" },
+                { en: "settle", zh: "定居；安顿" },
+                { en: "powerful", zh: "强大的" },
+                { en: "apologize", zh: "道歉" },
+                { en: "barely", zh: "几乎不；勉强" },
+                { en: "gather", zh: "聚集；收集" },
+                { en: "plentiful", zh: "丰富的；充足的" },
+                { en: "urgent", zh: "紧急的；迫切的" },
+                { en: "own", zh: "拥有" },
+                { en: "protest", zh: "抗议" },
+                { en: "offer ...to ...", zh: "向…提供…" },
+                { en: "in order to", zh: "为了…" },
+                { en: "no longer", zh: "不再…" },
+                { en: "in danger of", zh: "有…的危险" },
+                { en: "so far", zh: "到目前为止" },
+                { en: "move away from", zh: "远离…" },
+                { en: "fight against", zh: "对抗…；反抗…" },
+                { en: "logging company", zh: "伐木公司" },
+                { en: "let go of", zh: "放开…；放弃…" },
+                { en: "palm oil plantation", zh: "棕榈油种植园" },
+                { en: "convince sb to do sth", zh: "说服某人做某事" },
+                { en: "stay (be) connected to", zh: "与…保持联系" }
+            ];
+
+            function getWordsByRange(t) {
+                if (t === 'u8') return [...U8_WORDS];
+                const e = (parseInt(t) - 1) * 100;
+                return FULL_WORD_BANK.slice(e, e + 100);
+            }
 
             let currentSequence = [],
                 currentIndex = 0,
@@ -1294,7 +969,7 @@
                 answered = false,
                 currentOptions = [],
                 currentTheme = "default",
-                currentRangeLabel = "题库1",
+                currentRangeLabel = "题库4",
                 autoSpeakEnabled = false,
                 quizMode = "choice";
             let availableVoices = [],
@@ -1411,7 +1086,8 @@
             function getRandomDistractors(correctZh) {
                 const used = new Set([correctZh]);
                 const pool = [];
-                for (const w of FULL_WORD_BANK) {
+                const allWords = [...FULL_WORD_BANK, ...U8_WORDS];
+                for (const w of allWords) {
                     if (!used.has(w.zh)) { used.add(w.zh);
                         pool.push(w.zh) }
                     if (pool.length >= 50) break;
@@ -1438,9 +1114,11 @@
                 const map = new Map();
                 currentSessionMistakes.forEach(w => map.set(w, (map.get(w) || 0) + 1));
                 let html = '<div class="mistake-summary"><h3>📋 本次错词总结</h3>';
-                for (const [word, cnt] of map) { const ref = FULL_WORD_BANK.find(w => w.en === word); const zh = ref ? ref.zh : '';
-                    html +=
-                        `<div class="mistake-item"><span><strong>${word}</strong> (${cnt}次)</span><span>${zh}</span></div>` }
+                for (const [word, cnt] of map) {
+                    const ref = FULL_WORD_BANK.find(w => w.en === word) || U8_WORDS.find(w => w.en === word);
+                    const zh = ref ? ref.zh : '';
+                    html += `<div class="mistake-item"><span><strong>${word}</strong> (${cnt}次)</span><span>${zh}</span></div>`;
+                }
                 return html + '</div>';
             }
 
@@ -1481,7 +1159,6 @@
                         'selected'));
                     card.classList.add('selected');
                     matchSelectedId = id;
-                    // ✅ 点击左侧单词时自动发音
                     speakWord(id);
                 } else {
                     if (!matchSelectedId) {
@@ -1622,20 +1299,19 @@
             function prevWord() { if (currentIndex > 0) { currentIndex--; renderGame() } }
 
             function applyTheme(t) { document.body.classList.remove('theme-default', 'theme-dark', 'theme-warm',
-                    'theme-whitepink', 'theme-whitegreen', 'theme-charcoal', 'theme-deepforest', 'theme-aubergine');
+                    'theme-whitepink', 'theme-whitegreen', 'theme-charcoal');
                 document.body.classList.add(`theme-${t}`);
                 currentTheme = t;
                 document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(b => b.classList.toggle('active', b.dataset
                     .theme === t)) }
 
             function startGame() {
-                const range = document.querySelector('#quizRangeSelector .quiz-btn.active')?.dataset.range || '1';
+                const range = document.querySelector('#quizRangeSelector .quiz-btn.active')?.dataset.range || '4';
                 const order = document.querySelector('input[name="order"]:checked')?.value || 'original';
                 quizMode = document.querySelector('#quizModeSelector .quiz-btn.active')?.dataset.mode || 'choice';
                 let words = getWordsByRange(range);
-                if (!words.length) words = getWordsByRange('1');
-                currentRangeLabel = { '1': '题库1 (1-100)', '2': '题库2 (101-200)', '3': '题库3 (201-300)', '4': '题库4 (301-400)' } [
-                    range] || '题库1';
+                if (!words.length) words = getWordsByRange('4');
+                currentRangeLabel = range === 'u8' ? 'U8 单元' : '题库4 (301-400)';
                 if (order === 'random') words.sort(() => Math.random() - 0.5);
                 currentSequence = words;
                 currentIndex = 0;
@@ -1665,7 +1341,7 @@
                 window.speechSynthesis?.cancel() }
 
             function renderNotebook() { if (!notebookList) return; const range = document.querySelector('#notebookRangeSelector .quiz-btn.active')
-                    ?.dataset.range || '1';
+                    ?.dataset.range || '4';
                 notebookList.innerHTML = '';
                 getWordsByRange(range).forEach((w, i) => { const div = document.createElement('div');
                     div.className = 'notebook-item';
@@ -1678,8 +1354,8 @@
                 wrongbookList.innerHTML = ''; const sorted = [...mistakeMap.entries()].sort((a, b) => b[1] - a[1]); if (!sorted
                     .length) { wrongbookList.innerHTML =
                         '<div style="padding:24px;text-align:center;color:var(--footer);">暂无错题记录，继续加油！</div>'; return }
-                sorted.forEach(([word, cnt]) => { const ref = FULL_WORD_BANK.find(w => w.en === word); const zh = ref ? ref.zh :
-                        ''; const div = document.createElement('div');
+                sorted.forEach(([word, cnt]) => { const ref = FULL_WORD_BANK.find(w => w.en === word) || U8_WORDS.find(w => w
+                        .en === word); const zh = ref ? ref.zh : ''; const div = document.createElement('div');
                     div.className = 'notebook-item';
                     div.innerHTML =
                         `<div class="notebook-left"><span class="notebook-num" style="color:#c44f4f;font-weight:bold;">${cnt}次</span><span class="notebook-en">${word}</span></div><span class="notebook-zh">${zh}</span>`;
