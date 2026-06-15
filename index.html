@@ -674,12 +674,11 @@
 <body class="theme-default">
     <div id="startScreen" class="screen start-card">
         <div class="logo">📚 背词器</div>
-        <div class="sub">题库4 + U8单元 · 可选发音人 · 自动朗读</div>
+        <div class="sub">题库4 (301-400) · 可选发音人 · 自动朗读</div>
         <div class="option-group">
             <div class="group-title">📖 选择题库范围</div>
             <div class="quiz-buttons" id="quizRangeSelector">
                 <div data-range="4" class="quiz-btn active">📗 题库4 (301-400)</div>
-                <div data-range="u8" class="quiz-btn">📒 U8 单元</div>
             </div>
         </div>
         <div class="option-group">
@@ -713,7 +712,6 @@
             <div class="group-title">📖 单词本范围</div>
             <div class="quiz-buttons" id="notebookRangeSelector">
                 <div data-range="4" class="quiz-btn active">题库4</div>
-                <div data-range="u8" class="quiz-btn">U8</div>
             </div>
         </div>
         <div class="option-group">
@@ -730,7 +728,7 @@
         <button class="start-btn" id="startGameBtn">✨ 开始学习 ✨</button>
         <button class="notebook-btn" id="openNotebookBtn">📖 单词本</button>
         <button class="wrongbook-btn" id="openWrongBookBtn">📕 错题本 (按错误次数排序)</button>
-        <footer style="margin-top:20px;">🎧 点击单词发声 · 6种主题 · 错词总结 · 题库4 + U8 · 配对模式</footer>
+        <footer style="margin-top:20px;">🎧 点击单词发声 · 6种主题 · 错词总结 · 题库4 · 配对模式</footer>
     </div>
 
     <div id="gameScreen" class="screen hide">
@@ -778,7 +776,7 @@
                 <button class="next-btn" id="matchNextBtn" disabled>➡ 下一回合</button>
             </div>
         </div>
-        <footer>📚 题库4 (301-400) + U8单元 · 支持分题库训练 · 配对模式</footer>
+        <footer>📚 题库4 (301-400) · 支持配对模式</footer>
     </div>
 
     <div id="notebookScreen" class="screen hide">
@@ -797,6 +795,7 @@
     </div>
     <script>
         (function() {
+            // 题库4 原始文本
             const rawWordsText = `301. tattoo n. 纹身
 302. adjust v. 调节；调整
 303. emotional adj. 感情的
@@ -898,69 +897,35 @@
 399. appreciate v. 欣赏；鉴赏；感激
 400. customer n. 顾客`;
 
-            function parseWordList(t) {
-                const l = t.split(/\r?\n/),
-                    r = [];
-                const e = /^\d+\.\s+([\w\s&’'-]+?)\s+(?:[a-z]+\.(?:&[a-z]+\.)?|n\.\/v\.|phr\.|adj\.|adv\.|prep\.|conj\.|num\.|pron\.|v\.|n\.)\s+(.+)$/i;
-                for (let t of l) { t = t.trim(); if (!t) continue; const l = t.match(e); if (l) r.push({ en: l[1].trim(), zh: l[
-                            2].trim() }); else { const e = t.split(/\.\s+/); if (e.length >= 2) { let l = e.slice(1).join('.'); let a =
-                            l.split(/\s+(?:n\.|v\.|adj\.|adv\.|prep\.|phr\.|conj\.|num\.)/)[0]; let o = l.replace(
-                            /^[a-z&./]+?\s+/, ''); a && o && r.push({ en: a.trim(), zh: o.trim() }) } } }
-                return r;
+            function parseWordList(text) {
+                const lines = text.split(/\r?\n/);
+                const words = [];
+                const regex = /^\d+\.\s+([\w\s&’'-]+?)\s+(?:[a-z]+\.(?:&[a-z]+\.)?|n\.\/v\.|phr\.|adj\.|adv\.|prep\.|conj\.|num\.|pron\.|v\.|n\.)\s+(.+)$/i;
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line) continue;
+                    const match = line.match(regex);
+                    if (match) {
+                        words.push({ en: match[1].trim(), zh: match[2].trim() });
+                    } else {
+                        const parts = line.split(/\.\s+/);
+                        if (parts.length >= 2) {
+                            let rest = parts.slice(1).join('.');
+                            let en = rest.split(/\s+(?:n\.|v\.|adj\.|adv\.|prep\.|phr\.|conj\.|num\.)/)[0];
+                            let zh = rest.replace(/^[a-z&./]+?\s+/, '');
+                            if (en && zh) words.push({ en: en.trim(), zh: zh.trim() });
+                        }
+                    }
+                }
+                return words;
             }
 
-            const FULL_WORD_BANK = parseWordList(rawWordsText);
+            const BANK4 = parseWordList(rawWordsText);
 
-            const U8_WORDS = [
-                { en: "indigenous", zh: "原住民的" },
-                { en: "endangered", zh: "濒临灭绝的" },
-                { en: "disappear", zh: "消失" },
-                { en: "survive", zh: "生存；存活" },
-                { en: "root", zh: "根源；起源" },
-                { en: "nomadic", zh: "游牧的" },
-                { en: "nomad", zh: "游牧民族" },
-                { en: "ancestor", zh: "祖先" },
-                { en: "destroy", zh: "摧毁；破坏" },
-                { en: "unique", zh: "独特的；唯一的" },
-                { en: "trust", zh: "信任" },
-                { en: "near", zh: "接近；靠近" },
-                { en: "population", zh: "人口" },
-                { en: "predict", zh: "预测" },
-                { en: "refuse", zh: "拒绝" },
-                { en: "clinic", zh: "诊所" },
-                { en: "respect", zh: "尊重" },
-                { en: "support", zh: "支持" },
-                { en: "moving", zh: "感人的；令人动容的" },
-                { en: "overview", zh: "概述；总览" },
-                { en: "land", zh: "登陆；降落" },
-                { en: "ecotour", zh: "生态旅游" },
-                { en: "settle", zh: "定居；安顿" },
-                { en: "powerful", zh: "强大的" },
-                { en: "apologize", zh: "道歉" },
-                { en: "barely", zh: "几乎不；勉强" },
-                { en: "gather", zh: "聚集；收集" },
-                { en: "plentiful", zh: "丰富的；充足的" },
-                { en: "urgent", zh: "紧急的；迫切的" },
-                { en: "own", zh: "拥有" },
-                { en: "protest", zh: "抗议" },
-                { en: "offer ...to ...", zh: "向…提供…" },
-                { en: "in order to", zh: "为了…" },
-                { en: "no longer", zh: "不再…" },
-                { en: "in danger of", zh: "有…的危险" },
-                { en: "so far", zh: "到目前为止" },
-                { en: "move away from", zh: "远离…" },
-                { en: "fight against", zh: "对抗…；反抗…" },
-                { en: "logging company", zh: "伐木公司" },
-                { en: "let go of", zh: "放开…；放弃…" },
-                { en: "palm oil plantation", zh: "棕榈油种植园" },
-                { en: "convince sb to do sth", zh: "说服某人做某事" },
-                { en: "stay (be) connected to", zh: "与…保持联系" }
-            ];
-
-            function getWordsByRange(t) {
-                if (t === 'u8') return [...U8_WORDS];
-                const e = (parseInt(t) - 1) * 100;
-                return FULL_WORD_BANK.slice(e, e + 100);
+            // 获取题库4所有单词 (直接返回)
+            function getWordsByRange(range) {
+                // 目前只有题库4
+                return [...BANK4];
             }
 
             let currentSequence = [],
@@ -969,7 +934,7 @@
                 answered = false,
                 currentOptions = [],
                 currentTheme = "default",
-                currentRangeLabel = "题库4",
+                currentRangeLabel = "题库4 (301-400)",
                 autoSpeakEnabled = false,
                 quizMode = "choice";
             let availableVoices = [],
@@ -1086,22 +1051,18 @@
             function getRandomDistractors(correctZh) {
                 const used = new Set([correctZh]);
                 const pool = [];
-                const allWords = [...FULL_WORD_BANK, ...U8_WORDS];
-                for (const w of allWords) {
-                    if (!used.has(w.zh)) { used.add(w.zh);
-                        pool.push(w.zh) }
+                for (const w of BANK4) {
+                    if (!used.has(w.zh)) { used.add(w.zh); pool.push(w.zh); }
                     if (pool.length >= 50) break;
                 }
-                for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));
-                [pool[i], pool[j]] = [pool[j], pool[i]] }
+                for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
                 return pool.slice(0, 3);
             }
 
             function generateOptions(correctZh) {
                 const distractors = getRandomDistractors(correctZh);
                 const options = [{ text: correctZh, isCorrect: true }, ...distractors.map(t => ({ text: t, isCorrect: false }))];
-                for (let i = options.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));
-                [options[i], options[j]] = [options[j], options[i]] }
+                for (let i = options.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [options[i], options[j]] = [options[j], options[i]]; }
                 return options;
             }
 
@@ -1115,7 +1076,7 @@
                 currentSessionMistakes.forEach(w => map.set(w, (map.get(w) || 0) + 1));
                 let html = '<div class="mistake-summary"><h3>📋 本次错词总结</h3>';
                 for (const [word, cnt] of map) {
-                    const ref = FULL_WORD_BANK.find(w => w.en === word) || U8_WORDS.find(w => w.en === word);
+                    const ref = BANK4.find(w => w.en === word);
                     const zh = ref ? ref.zh : '';
                     html += `<div class="mistake-item"><span><strong>${word}</strong> (${cnt}次)</span><span>${zh}</span></div>`;
                 }
@@ -1137,15 +1098,12 @@
                 matchSelectedId = null;
                 const leftItems = round.map(w => ({ id: w.en, text: w.en, type: 'en' })).sort(() => Math.random() - 0.5);
                 const rightItems = round.map(w => ({ id: w.en, text: w.zh, type: 'zh' })).sort(() => Math.random() - 0.5);
-                matchLeftColumn.innerHTML = leftItems.map(i =>
-                    `<div class="match-card" data-id="${i.id}" data-type="en">${i.text}</div>`).join('');
-                matchRightColumn.innerHTML = rightItems.map(i =>
-                    `<div class="match-card" data-id="${i.id}" data-type="zh">${i.text}</div>`).join('');
+                matchLeftColumn.innerHTML = leftItems.map(i => `<div class="match-card" data-id="${i.id}" data-type="en">${i.text}</div>`).join('');
+                matchRightColumn.innerHTML = rightItems.map(i => `<div class="match-card" data-id="${i.id}" data-type="zh">${i.text}</div>`).join('');
                 document.querySelectorAll('.match-card').forEach(card => {
                     card.onclick = () => handleMatchCardClick(card);
                 });
-                matchRoundInfo.textContent =
-                    `配对模式 · 剩余${matchWords.length + count}词 · 本回合${count}对`;
+                matchRoundInfo.textContent = `配对模式 · 剩余${matchWords.length + count}词 · 本回合${count}对`;
                 matchFeedbackMsg.innerHTML = '💡 点击左侧单词（会自动发音），再点击右侧对应翻译进行配对';
                 matchNextBtn.disabled = true;
             }
@@ -1155,8 +1113,7 @@
                 const type = card.dataset.type;
                 const id = card.dataset.id;
                 if (type === 'en') {
-                    document.querySelectorAll('.match-card[data-type="en"].selected').forEach(c => c.classList.remove(
-                        'selected'));
+                    document.querySelectorAll('.match-card[data-type="en"].selected').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
                     matchSelectedId = id;
                     speakWord(id);
@@ -1166,8 +1123,7 @@
                         return;
                     }
                     if (id === matchSelectedId) {
-                        document.querySelectorAll(`.match-card[data-id="${id}"]`).forEach(c => { c.classList.add('paired');
-                            c.classList.remove('selected') });
+                        document.querySelectorAll(`.match-card[data-id="${id}"]`).forEach(c => { c.classList.add('paired'); c.classList.remove('selected'); });
                         matchPairedCount++;
                         correctCount++;
                         scoreTextSpan.textContent = `✅ 答对: ${correctCount}`;
@@ -1192,8 +1148,7 @@
                 if (currentIndex >= currentSequence.length) {
                     currentWordEl.textContent = "🎉 通关 🎉";
                     const summary = getMistakeSummary();
-                    let html =
-                        `<div class="finish-message">✨ 恭喜你完成了 ${currentRangeLabel} 题库！ ✨<br>点击「首页」可以选择其他范围继续挑战</div>`;
+                    let html = `<div class="finish-message">✨ 恭喜你完成了 ${currentRangeLabel} 题库！ ✨<br>点击「首页」可以选择其他范围继续挑战</div>`;
                     if (summary) html += summary;
                     else html += '<div style="margin-top:12px;color:var(--text);">🎯 全部答对，太厉害了！</div>';
                     optionsContainer.innerHTML = html;
@@ -1215,8 +1170,7 @@
                         currentOptions = history.options;
                         answered = history.answered;
                         if (history.correctCount !== undefined) correctCount = history.correctCount;
-                    } else { currentOptions = generateOptions(word.zh);
-                        answered = false }
+                    } else { currentOptions = generateOptions(word.zh); answered = false }
                     optionsContainer.innerHTML = '';
                     currentOptions.forEach((opt, idx) => {
                         const btn = document.createElement('button');
@@ -1224,30 +1178,15 @@
                         btn.textContent = opt.text;
                         btn.dataset.correct = opt.isCorrect;
                         btn.dataset.index = idx;
-                        if (history && history.answered) { btn.disabled = true; if (opt.isCorrect) btn.classList.add(
-                                'correct-highlight'); if (history.selectedOptionIndex === idx && !opt.isCorrect) btn
-                                .classList.add('wrong-highlight') } else { btn.addEventListener('click', () =>
-                                handleAnswerChoice(btn, opt.isCorrect, idx)) }
+                        if (history && history.answered) { btn.disabled = true; if (opt.isCorrect) btn.classList.add('correct-highlight'); if (history.selectedOptionIndex === idx && !opt.isCorrect) btn.classList.add('wrong-highlight') } else { btn.addEventListener('click', () => handleAnswerChoice(btn, opt.isCorrect, idx)) }
                         optionsContainer.appendChild(btn);
                     });
-                    feedbackMsgDiv.innerHTML = (history && history.answered) ? (history.feedbackMsg || '🤔 选择一个释义～') :
-                        '🤔 选择一个释义～';
+                    feedbackMsgDiv.innerHTML = (history && history.answered) ? (history.feedbackMsg || '🤔 选择一个释义～') : '🤔 选择一个释义～';
                     nextBtn.disabled = !(history && history.answered);
                 } else {
                     optionsContainer.classList.add('hide');
                     inputModeContainer.classList.remove('hide');
-                    if (history && history.inputState) { answered = true; if (history.correctCount !== undefined) correctCount =
-                            history.correctCount;
-                        inputAnswerField.value = history.userInput || '';
-                        inputAnswerField.disabled = true;
-                        submitInputBtn.disabled = true;
-                        feedbackMsgDiv.innerHTML = history.feedbackMsg || '';
-                        nextBtn.disabled = false } else { answered = false;
-                        inputAnswerField.value = '';
-                        inputAnswerField.disabled = false;
-                        submitInputBtn.disabled = false;
-                        feedbackMsgDiv.innerHTML = '💡 请输入中文释义后点击确认';
-                        nextBtn.disabled = true }
+                    if (history && history.inputState) { answered = true; if (history.correctCount !== undefined) correctCount = history.correctCount; inputAnswerField.value = history.userInput || ''; inputAnswerField.disabled = true; submitInputBtn.disabled = true; feedbackMsgDiv.innerHTML = history.feedbackMsg || ''; nextBtn.disabled = false } else { answered = false; inputAnswerField.value = ''; inputAnswerField.disabled = false; submitInputBtn.disabled = false; feedbackMsgDiv.innerHTML = '💡 请输入中文释义后点击确认'; nextBtn.disabled = true }
                 }
                 progressTextSpan.textContent = `${currentRangeLabel} · 第 ${currentIndex+1} / ${currentSequence.length} 词`;
                 scoreTextSpan.textContent = `✅ 答对: ${correctCount}`;
@@ -1259,18 +1198,10 @@
                 if (answered) { feedbackMsgDiv.innerHTML = '⚠️ 已经作答，进入下一题吧'; return }
                 answered = true;
                 const word = currentSequence[currentIndex];
-                document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.correct === 'true') b
-                        .classList.add('correct-highlight'); if (parseInt(b.dataset.index) === optIndex && !isCorrect) b
-                        .classList.add('wrong-highlight') });
-                if (isCorrect) { correctCount++;
-                    scoreTextSpan.textContent = `✅ 答对: ${correctCount}`;
-                    feedbackMsgDiv.innerHTML = `🎉 正确！ "${word.zh}" 很棒！` } else { mistakeMap.set(word.en, (mistakeMap.get(word
-                        .en) || 0) + 1);
-                    addCurrentMistake(word.en);
-                    feedbackMsgDiv.innerHTML = `❌ 错误！ 正确答案是 "${word.zh}"。继续加油～` }
+                document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.correct === 'true') b.classList.add('correct-highlight'); if (parseInt(b.dataset.index) === optIndex && !isCorrect) b.classList.add('wrong-highlight') });
+                if (isCorrect) { correctCount++; scoreTextSpan.textContent = `✅ 答对: ${correctCount}`; feedbackMsgDiv.innerHTML = `🎉 正确！ "${word.zh}" 很棒！` } else { mistakeMap.set(word.en, (mistakeMap.get(word.en) || 0) + 1); addCurrentMistake(word.en); feedbackMsgDiv.innerHTML = `❌ 错误！ 正确答案是 "${word.zh}"。继续加油～` }
                 nextBtn.disabled = false;
-                answerHistory[currentIndex] = { answered: true, correctCount, options: currentOptions, selectedOptionIndex: optIndex,
-                    feedbackMsg: feedbackMsgDiv.innerHTML, word };
+                answerHistory[currentIndex] = { answered: true, correctCount, options: currentOptions, selectedOptionIndex: optIndex, feedbackMsg: feedbackMsgDiv.innerHTML, word };
             }
 
             function handleInputSubmit() {
@@ -1281,37 +1212,23 @@
                 answered = true;
                 inputAnswerField.disabled = true;
                 submitInputBtn.disabled = true;
-                if (ok) { correctCount++;
-                    scoreTextSpan.textContent = `✅ 答对: ${correctCount}`;
-                    feedbackMsgDiv.innerHTML = `🎉 正确！ "${word.zh}" 很棒！` } else { mistakeMap.set(word.en, (mistakeMap.get(word
-                        .en) || 0) + 1);
-                    addCurrentMistake(word.en);
-                    feedbackMsgDiv.innerHTML = `❌ 错误！ 正确答案是 "${word.zh}"。你的输入："${val}"` }
+                if (ok) { correctCount++; scoreTextSpan.textContent = `✅ 答对: ${correctCount}`; feedbackMsgDiv.innerHTML = `🎉 正确！ "${word.zh}" 很棒！` } else { mistakeMap.set(word.en, (mistakeMap.get(word.en) || 0) + 1); addCurrentMistake(word.en); feedbackMsgDiv.innerHTML = `❌ 错误！ 正确答案是 "${word.zh}"。你的输入："${val}"` }
                 nextBtn.disabled = false;
-                answerHistory[currentIndex] = { answered: true, correctCount, inputState: true, userInput: val,
-                    feedbackMsg: feedbackMsgDiv.innerHTML, word };
+                answerHistory[currentIndex] = { answered: true, correctCount, inputState: true, userInput: val, feedbackMsg: feedbackMsgDiv.innerHTML, word };
             }
 
-            function nextWord() { if (!answered) { feedbackMsgDiv.innerHTML = '📢 请先回答当前单词'; return }
-                currentIndex++;
-                renderGame() }
-
+            function nextWord() { if (!answered) { feedbackMsgDiv.innerHTML = '📢 请先回答当前单词'; return } currentIndex++; renderGame() }
             function prevWord() { if (currentIndex > 0) { currentIndex--; renderGame() } }
 
-            function applyTheme(t) { document.body.classList.remove('theme-default', 'theme-dark', 'theme-warm',
-                    'theme-whitepink', 'theme-whitegreen', 'theme-charcoal');
-                document.body.classList.add(`theme-${t}`);
-                currentTheme = t;
-                document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(b => b.classList.toggle('active', b.dataset
-                    .theme === t)) }
+            function applyTheme(t) { document.body.classList.remove('theme-default', 'theme-dark', 'theme-warm', 'theme-whitepink', 'theme-whitegreen', 'theme-charcoal'); document.body.classList.add(`theme-${t}`); currentTheme = t; document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === t)) }
 
             function startGame() {
-                const range = document.querySelector('#quizRangeSelector .quiz-btn.active')?.dataset.range || '4';
+                const range = '4'; // 固定为题库4
                 const order = document.querySelector('input[name="order"]:checked')?.value || 'original';
                 quizMode = document.querySelector('#quizModeSelector .quiz-btn.active')?.dataset.mode || 'choice';
                 let words = getWordsByRange(range);
                 if (!words.length) words = getWordsByRange('4');
-                currentRangeLabel = range === 'u8' ? 'U8 单元' : '题库4 (301-400)';
+                currentRangeLabel = '题库4 (301-400)';
                 if (order === 'random') words.sort(() => Math.random() - 0.5);
                 currentSequence = words;
                 currentIndex = 0;
@@ -1336,64 +1253,35 @@
                 gameScreen.classList.remove('hide');
             }
 
-            function backToHome() { gameScreen.classList.add('hide');
-                startScreen.classList.remove('hide');
-                window.speechSynthesis?.cancel() }
+            function backToHome() { gameScreen.classList.add('hide'); startScreen.classList.remove('hide'); window.speechSynthesis?.cancel() }
 
-            function renderNotebook() { if (!notebookList) return; const range = document.querySelector('#notebookRangeSelector .quiz-btn.active')
-                    ?.dataset.range || '4';
-                notebookList.innerHTML = '';
-                getWordsByRange(range).forEach((w, i) => { const div = document.createElement('div');
-                    div.className = 'notebook-item';
-                    div.innerHTML =
-                        `<div class="notebook-left"><span class="notebook-num">${i+1}</span><span class="notebook-en">${w.en}</span></div><span class="notebook-zh">${w.zh}</span>`;
-                    div.addEventListener('click', () => speakWord(w.en));
-                    notebookList.appendChild(div) }) }
+            function renderNotebook() { if (!notebookList) return; notebookList.innerHTML = ''; const words = getWordsByRange('4'); words.forEach((w, i) => { const div = document.createElement('div'); div.className = 'notebook-item'; div.innerHTML = `<div class="notebook-left"><span class="notebook-num">${i+1}</span><span class="notebook-en">${w.en}</span></div><span class="notebook-zh">${w.zh}</span>`; div.addEventListener('click', () => speakWord(w.en)); notebookList.appendChild(div) }) }
 
-            function renderWrongbook() { if (!wrongbookList) return;
-                wrongbookList.innerHTML = ''; const sorted = [...mistakeMap.entries()].sort((a, b) => b[1] - a[1]); if (!sorted
-                    .length) { wrongbookList.innerHTML =
-                        '<div style="padding:24px;text-align:center;color:var(--footer);">暂无错题记录，继续加油！</div>'; return }
-                sorted.forEach(([word, cnt]) => { const ref = FULL_WORD_BANK.find(w => w.en === word) || U8_WORDS.find(w => w
-                        .en === word); const zh = ref ? ref.zh : ''; const div = document.createElement('div');
-                    div.className = 'notebook-item';
-                    div.innerHTML =
-                        `<div class="notebook-left"><span class="notebook-num" style="color:#c44f4f;font-weight:bold;">${cnt}次</span><span class="notebook-en">${word}</span></div><span class="notebook-zh">${zh}</span>`;
-                    div.addEventListener('click', () => speakWord(word));
-                    wrongbookList.appendChild(div) }) }
+            function renderWrongbook() { if (!wrongbookList) return; wrongbookList.innerHTML = ''; const sorted = [...mistakeMap.entries()].sort((a, b) => b[1] - a[1]); if (!sorted.length) { wrongbookList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--footer);">暂无错题记录，继续加油！</div>'; return } sorted.forEach(([word, cnt]) => { const ref = BANK4.find(w => w.en === word); const zh = ref ? ref.zh : ''; const div = document.createElement('div'); div.className = 'notebook-item'; div.innerHTML = `<div class="notebook-left"><span class="notebook-num" style="color:#c44f4f;font-weight:bold;">${cnt}次</span><span class="notebook-en">${word}</span></div><span class="notebook-zh">${zh}</span>`; div.addEventListener('click', () => speakWord(word)); wrongbookList.appendChild(div) }) }
 
-            function openNotebook() { startScreen.classList.add('hide');
-                gameScreen.classList.add('hide');
-                notebookScreen.classList.remove('hide');
-                renderNotebook() }
+            function openNotebook() { startScreen.classList.add('hide'); gameScreen.classList.add('hide'); notebookScreen.classList.remove('hide'); renderNotebook() }
+            function closeNotebook() { notebookScreen.classList.add('hide'); startScreen.classList.remove('hide') }
+            function openWrongbook() { startScreen.classList.add('hide'); gameScreen.classList.add('hide'); wrongbookScreen.classList.remove('hide'); renderWrongbook() }
+            function closeWrongbook() { wrongbookScreen.classList.add('hide'); startScreen.classList.remove('hide') }
 
-            function closeNotebook() { notebookScreen.classList.add('hide');
-                startScreen.classList.remove('hide') }
-
-            function openWrongbook() { startScreen.classList.add('hide');
-                gameScreen.classList.add('hide');
-                wrongbookScreen.classList.remove('hide');
-                renderWrongbook() }
-
-            function closeWrongbook() { wrongbookScreen.classList.add('hide');
-                startScreen.classList.remove('hide') }
-
+            // 事件绑定
             document.querySelectorAll('#quizRangeSelector .quiz-btn').forEach(b => b.addEventListener('click', function() {
                 document.querySelectorAll('#quizRangeSelector .quiz-btn').forEach(x => x.classList.remove('active'));
-                this.classList.add('active') }));
+                this.classList.add('active');
+            }));
             document.querySelectorAll('#quizModeSelector .quiz-btn').forEach(b => b.addEventListener('click', function() {
                 document.querySelectorAll('#quizModeSelector .quiz-btn').forEach(x => x.classList.remove('active'));
-                this.classList.add('active') }));
+                this.classList.add('active');
+            }));
             document.querySelectorAll('#notebookRangeSelector .quiz-btn').forEach(b => b.addEventListener('click', function() {
-                document.querySelectorAll('#notebookRangeSelector .quiz-btn').forEach(x => x.classList.remove(
-                'active'));
-                this.classList.add('active') }));
+                document.querySelectorAll('#notebookRangeSelector .quiz-btn').forEach(x => x.classList.remove('active'));
+                this.classList.add('active');
+            }));
             startBtn.addEventListener('click', startGame);
             backHomeBtn.addEventListener('click', backToHome);
             nextBtn.addEventListener('click', nextWord);
             prevBtn.addEventListener('click', prevWord);
-            wordClickArea.addEventListener('click', () => { if (currentIndex < currentSequence.length) speakWord(
-                    currentSequence[currentIndex].en) });
+            wordClickArea.addEventListener('click', () => { if (currentIndex < currentSequence.length) speakWord(currentSequence[currentIndex].en) });
             submitInputBtn.addEventListener('click', handleInputSubmit);
             inputAnswerField.addEventListener('keypress', e => { if (e.key === 'Enter') handleInputSubmit() });
             matchNextBtn.addEventListener('click', startMatchRound);
@@ -1401,10 +1289,8 @@
             closeNotebookBtn.addEventListener('click', closeNotebook);
             openWrongBookBtn.addEventListener('click', openWrongbook);
             closeWrongBookBtn.addEventListener('click', closeWrongbook);
-            document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(b => b.addEventListener('click', () => applyTheme(
-                b.dataset.theme)));
-            document.querySelectorAll('#inlineThemeSwitcher .tiny-theme').forEach(d => d.addEventListener('click', () => applyTheme(
-                d.dataset.theme)));
+            document.querySelectorAll('#themeSelectorStart .theme-btn').forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.theme)));
+            document.querySelectorAll('#inlineThemeSwitcher .tiny-theme').forEach(d => d.addEventListener('click', () => applyTheme(d.dataset.theme)));
             applyTheme('default');
             loadVoices();
         })();
