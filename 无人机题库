@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>无人机题库 · 逐题闯关（含检查与上一题）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            color: #1a2c3e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            padding: 28px 30px 40px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #e6edf4;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #0b2b3b;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1 small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #4d6b7e;
+            margin-left: 12px;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 10px 28px;
+            border-radius: 60px;
+            border: 2px solid #cbdbe2;
+            background: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1a3b4f;
+        }
+
+        .mode-btn.active {
+            background: #1a4a6f;
+            border-color: #1a4a6f;
+            color: white;
+            box-shadow: 0 4px 10px rgba(26,74,111,0.2);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #f0f7fc;
+            border-color: #8bb3cc;
+        }
+
+        /* 进度 & 得分 */
+        .progress-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #f6f9fc;
+            border-radius: 60px;
+            padding: 12px 22px;
+            margin-bottom: 30px;
+        }
+
+        .progress-text {
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .progress-text strong {
+            color: #0b2b3b;
+            font-size: 1.2rem;
+        }
+
+        .score-badge {
+            background: #ffcd3c;
+            color: #1e2f3e;
+            font-weight: bold;
+            border-radius: 40px;
+            padding: 6px 20px;
+            font-size: 1.1rem;
+        }
+
+        /* 题目卡片 */
+        .question-card {
+            background: #fafdff;
+            border: 2px solid #e2edf2;
+            border-radius: 32px;
+            padding: 32px 30px;
+            margin-bottom: 24px;
+            transition: 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .q-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .q-type {
+            background: #d9e9f0;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #005073;
+            letter-spacing: 0.3px;
+        }
+
+        .q-number {
+            font-weight: 600;
+            color: #1f4c66;
+        }
+
+        .q-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #0b2b3b;
+            margin-bottom: 20px;
+            word-break: break-word;
+        }
+
+        /* 填空输入 */
+        .blank-input {
+            display: inline-block;
+            min-width: 200px;
+            padding: 10px 18px;
+            border: 2px solid #cbdbe2;
+            border-radius: 60px;
+            font-size: 1rem;
+            background: white;
+            transition: 0.15s;
+            font-family: inherit;
+            width: auto;
+        }
+
+        .blank-input:focus {
+            border-color: #2c7da0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.15);
+        }
+
+        .blank-input:disabled {
+            background: #f2f6f9;
+            border-color: #d0dce4;
+        }
+
+        /* 选择题选项 */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 8px 0 12px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            border-radius: 60px;
+            border: 2px solid #deeaf0;
+            cursor: pointer;
+            transition: 0.15s;
+            background: white;
+            font-size: 1rem;
+        }
+
+        .option-label:hover:not(.disabled-opt) {
+            background: #f0f7fc;
+            border-color: #b5d0dd;
+        }
+
+        .option-label.selected {
+            background: #e1f0f7;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 1px #2c7da0;
+        }
+
+        .option-label.disabled-opt {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .option-label input[type="radio"] {
+            accent-color: #2c7da0;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .option-letter {
+            font-weight: 700;
+            color: #1f4c66;
+            min-width: 24px;
+        }
+
+        /* 反馈 & 导航按钮 */
+        .action-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 16px;
+        }
+
+        .feedback-box {
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .feedback-correct {
+            background: #e1f7e8;
+            color: #1e6f3f;
+        }
+
+        .feedback-wrong {
+            background: #ffe6e5;
+            color: #bc3900;
+        }
+
+        .feedback-idle {
+            background: #f0f4f8;
+            color: #4b6d80;
+        }
+
+        .btn-nav {
+            background: #1a4a6f;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(26,74,111,0.15);
+            white-space: nowrap;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            background: #0f3857;
+            transform: scale(1.02);
+        }
+
+        .btn-nav:disabled {
+            background: #b7cbd9;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-nav.secondary {
+            background: #6b8fa8;
+        }
+
+        .btn-nav.secondary:hover:not(:disabled) {
+            background: #51758e;
+        }
+
+        .btn-check {
+            background: #ffb347;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1e2f3e;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(255,179,71,0.2);
+        }
+
+        .btn-check:hover:not(:disabled) {
+            background: #ff9f1c;
+            transform: scale(1.02);
+        }
+
+        .btn-check:disabled {
+            background: #e6d5b0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-reset {
+            background: #e1e9f0;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 60px;
+            font-weight: 500;
+            color: #1a3b4f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #d0dce6;
+        }
+
+        .btn-reset.reset-mode {
+            background: #ffb347;
+            color: #1e2f3e;
+        }
+
+        .btn-reset.reset-mode:hover {
+            background: #ff9f1c;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* 完成状态 */
+        .complete-msg {
+            background: #e1f7e8;
+            border-radius: 40px;
+            padding: 20px 28px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a5a3a;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 18px 16px; }
+            .header h1 { font-size: 1.5rem; }
+            .mode-btn { padding: 8px 18px; font-size: 0.9rem; }
+            .question-card { padding: 24px 18px; }
+            .q-text { font-size: 1rem; }
+            .blank-input { min-width: 140px; }
+            .action-area { flex-direction: column; align-items: stretch; }
+            .btn-nav, .btn-check { width: 100%; text-align: center; }
+            .feedback-box { min-width: unset; }
+            .nav-group { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- 头部 -->
+    <div class="header">
+        <h1>✈ 无人机闯关 <small>逐题训练</small></h1>
+        <div class="mode-tabs">
+            <button class="mode-btn active" data-mode="fill" id="modeFillBtn">📝 填空题</button>
+            <button class="mode-btn" data-mode="choice" id="modeChoiceBtn">🔘 选择题</button>
+        </div>
+    </div>
+
+    <!-- 进度 & 得分 -->
+    <div class="progress-area">
+        <span class="progress-text">第 <strong id="currentNum">1</strong> / <span id="totalNum">100</span> 题</span>
+        <span class="score-badge">🏆 <span id="scoreDisplay">0</span> / <span id="totalScoreNum">100</span></span>
+    </div>
+
+    <!-- 题目卡片 -->
+    <div id="questionCard" class="question-card">
+        <!-- 动态渲染 -->
+    </div>
+
+    <!-- 底部操作 -->
+    <div class="footer-actions">
+        <button class="btn-reset reset-mode" id="resetModeBtn">🔄 重新开始本模式</button>
+        <button class="btn-reset" id="resetAllBtn">🗑️ 重置全部进度</button>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 题库数据 (完全来自文档)
+    // --------------------------------------------------------------
+    const fillBlankData = [
+        { text: "操作无人机前，首要检查______是否完好、无鼓包、破损，是防范起火的关键。", answer: "锂电池" },
+        { text: "锂聚合物电池（LiPo）长期不使用时，需将电量维持在______% 存放，避免亏电或过充损坏。", answer: "50" },
+        { text: "无人机飞行前，必须确认机身、螺旋桨无裂纹、变形，______安装牢固，防止飞行脱落。", answer: "螺旋桨" },
+        { text: "四旋翼无人机起飞前，手动拨动每个螺旋桨，需保证转动顺畅、无卡顿、无______现象。", answer: "摩擦异响" },
+        { text: "户外飞行前需评估______，大风、雷雨、浓雾天气严禁起飞。", answer: "风向/天气" },
+        { text: "按照全球通用规则，普通民用无人机需保持在操作员______范围内飞行。", answer: "目视视距（VLOS）" },
+        { text: "国内及多数国家规定，民用无人机离地最大飞行高度限制为______米。", answer: "120" },
+        { text: "无人机飞行时，与地面人群、建筑物的安全距离建议不小于______米。", answer: "30" },
+        { text: "无人机严禁在机场、军事区、政府机关等______区域内起降飞行。", answer: "禁飞" },
+        { text: "更换无人机螺旋桨时，必须区分顺时针（CW）和______桨，装反会直接导致起飞侧翻。", answer: "逆时针（CCW）" },
+        { text: "四旋翼 X 型布局无人机，左前、右后电机搭配顺时针桨，右前、左后搭配______桨。", answer: "逆时针（CCW）" },
+        { text: "螺旋桨标识1045，代表桨叶直径 10 英寸、______4.5 英寸。", answer: "螺距" },
+        { text: "飞行中发现无人机持续向单侧漂移，无风环境下大概率是______传感器未校准。", answer: "陀螺仪" },
+        { text: "遥控器出现信号卡顿、断连，优先检查遥控器与无人机两端的______是否松动。", answer: "天线" },
+        { text: "无人机出现 '抖舵、飞行不稳'，除传感器外，还需检查机架机臂是否______。", answer: "松动/变形" },
+        { text: "无刷电机搭配电调时，电调额定电流需比电机最大工作电流预留______余量。", answer: "20%~50%" },
+        { text: "WS500 无人机使用 2216 920KV 电机，该型号中 22 代表定子宽度为______mm。", answer: "22" },
+        { text: "电机 KV 值含义：每 1 伏特电压下，电机每分钟______次数。", answer: "转动" },
+        { text: "大尺寸螺旋桨适合______KV 低速电机，小桨搭配高 KV 电机使用。", answer: "低" },
+        { text: "电调（ESC）安装时需预留通风空间，防止工作中______过热烧毁。", answer: "温度" },
+        { text: "多旋翼无人机单个电机故障时，六旋翼、八旋翼因具备______设计，仍可安全迫降。", answer: "动力冗余" },
+        { text: "飞控（飞行控制器）连接外部传感器时，优先使用______协议保证低延迟。", answer: "CRSF" },
+        { text: "室内无 GPS 环境飞行，需开启______模式，依靠光流传感器稳定机身。", answer: "光流" },
+        { text: "无人机 GPS 搜星数量不足______颗时，禁止执行定点、自动返航功能。", answer: "8" },
+        { text: "无人机失联、信号中断后，______功能会自动控制飞机返回起飞点。", answer: "自动返航（RTH）" },
+        { text: "调试 ArduPilot 飞控时，需使用______软件连接地面站进行参数设置。", answer: "Mission Planner" },
+        { text: "遥控器与无人机接收机配对的过程称为______，配对失败无法操控飞机。", answer: "对频/绑定" },
+        { text: "ExpressLRS 无线系统使用中，天线______朝向地面会大幅降低遥控距离。", answer: "朝下" },
+        { text: "无人机云台相机画面抖动，优先检查云台减震部件是否老化、______失效。", answer: "减震球" },
+        { text: "热成像无人机主要用于电力巡检、消防搜救，依靠捕捉物体______成像。", answer: "红外热源" },
+        { text: "激光雷达（LiDAR）无人机可实现地形三维建模，在______天气下也能正常作业。", answer: "大雾/黑夜" },
+        { text: "航拍作业前，需提前规划航线、标注禁飞区，该流程称为______。", answer: "任务规划" },
+        { text: "执行测绘任务时，无人机需保持恒定高度与速度，保证照片______统一。", answer: "拍摄角度" },
+        { text: "无人机电池电量低于______% 时，应立即返航，禁止继续作业。", answer: "20" },
+        { text: "锂电池充电时必须有人值守，严禁______充电，防止起火爆炸。", answer: "无人值守" },
+        { text: "锂电池充电、存放建议使用专用______袋，提升防火安全性。", answer: "防火（LiPo）" },
+        { text: "无人机完成飞行后，需先断开______电源，再关闭遥控器。", answer: "无人机" },
+        { text: "无人机组装焊接作业，首选______W 可调温电烙铁，适配小型电子元件。", answer: "60" },
+        { text: "焊接导线、电路板时，必须使用______去除氧化层，保证焊点牢固。", answer: "助焊剂" },
+        { text: "虚焊、______是无人机电控故障最常见的两类焊接问题。", answer: "假焊" },
+        { text: "焊接完成后，裸露导线需套上______并加热收缩，实现绝缘防护。", answer: "热缩管" },
+        { text: "检测导线通断、电路短路，优先使用万用表______档位。", answer: "通断" },
+        { text: "测量锂电池单体电压，需使用万用表______直流电压档。", answer: "直流" },
+        { text: "无人机动力主线一般选用 14AWG 硅胶线，信号细线常用______AWG 导线。", answer: "28" },
+        { text: "AWG 线规数值越大，导线直径越______，承载电流能力越弱。", answer: "细" },
+        { text: "无人机布线时，动力大电流线缆与______线缆必须分开走线，避免电磁干扰。", answer: "信号" },
+        { text: "XT60 接头是中小型无人机最常用的电源接口，其额定连续电流为______A。", answer: "60" },
+        { text: "大载重、大功率无人机优先选用 XT90 接头，该接头具备______防火花设计。", answer: "防火花" },
+        { text: "JST 接头多用于无人机小型信号线路，最大承载电流仅______A。", answer: "5" },
+        { text: "无人机机架出现细微裂纹，应急修复可使用______类高强度胶水。", answer: "环氧树脂" },
+        { text: "电机固定螺丝长期震动易松动，安装时需涂抹______防松胶。", answer: "螺纹" },
+        { text: "无人机起落架主要作用是起降缓冲，破损后会直接加剧机身______。", answer: "震动" },
+        { text: "固定翼无人机起飞大多需要跑道或弹射装置，无法直接______起降。", answer: "垂直" },
+        { text: "固定翼混合 VTOL 无人机结合旋翼与固定翼优势，可垂直起飞、______长距离飞行。", answer: "高速" },
+        { text: "单旋翼无人机外形类似直升机，高速旋转的主桨______较高，作业时需保持安全距离。", answer: "安全风险" },
+        { text: "多旋翼无人机四大操控通道：油门、俯仰、横滚、______。", answer: "偏航" },
+        { text: "遥控器左摇杆常规操控油门与______，右摇杆控制俯仰与横滚。", answer: "偏航" },
+        { text: "推动右摇杆向前，无人机做______动作；向后则向后飞行。", answer: "俯仰向前" },
+        { text: "拨动左摇杆左右，无人机会绕中心旋转，该动作称为______。", answer: "偏航" },
+        { text: "无人机悬停状态下，升力与______大小相等、方向相反。", answer: "重力" },
+        { text: "无人机向前飞行时，除升力、重力外，还会产生空气______阻碍运动。", answer: "阻力" },
+        { text: "为降低风阻，无人机外壳、机臂多采用______流线型设计。", answer: "流线型" },
+        { text: "机架设计的核心原则：在保证结构强度的前提下尽可能______。", answer: "减重" },
+        { text: "无人机重心偏移，最直观的表现是______困难、飞行倾斜。", answer: "悬停" },
+        { text: "组装无人机时，电池尽量安装在机身______位置，保证重心平衡。", answer: "中心" },
+        { text: "工业巡检无人机长期户外作业，优先选用______、耐腐蚀的机架材料。", answer: "防水" },
+        { text: "碳纤维机架优点是轻量高强度，缺点是脆性大，受到剧烈撞击易______。", answer: "断裂" },
+        { text: "铝合金机架性价比高，抗形变能力强，是______级无人机主流选材。", answer: "消费/入门" },
+        { text: "无人机夜间作业，必须开启______频闪灯，满足民航可视要求。", answer: "防撞" },
+        { text: "无人机探照灯主要用于夜间搜救、室内作业，作用是______环境。", answer: "照明" },
+        { text: "飞行中遭遇突发强风，操作员应降低飞行速度，避免______失控。", answer: "机身" },
+        { text: "无人机紧急迫降时，优先选择空旷、无人群的______区域。", answer: "空旷" },
+        { text: "执行森林防火巡检无人机，需搭配热成像相机与______传感器。", answer: "烟雾/火情" },
+        { text: "农业植保无人机作业前，需检查药箱密封性，防止药液______腐蚀电路。", answer: "渗漏" },
+        { text: "植保无人机喷洒作业时，需控制飞行高度，保证药液______均匀。", answer: "喷洒" },
+        { text: "无人机完成每日作业后，需清洁机身、螺旋桨及______表面的灰尘污渍。", answer: "传感器/镜头" },
+        { text: "长期存放无人机，需拆除电池，将机身置于______、干燥环境。", answer: "阴凉" },
+        { text: "无人机固件升级前，必须保证设备电量充足，避免升级中断导致______。", answer: "变砖/瘫痪" },
+        { text: "飞控固件刷新失败，会造成无人机______，无法正常启动。", answer: "变砖/瘫痪" },
+        { text: "航点规划飞行属于______飞行模式，无需人工实时操控。", answer: "自主航点" },
+        { text: "新手练习无人机，建议先在______环境飞行，规避人员与障碍物。", answer: "室内/空旷场地" },
+        { text: "无人机新手优先练习______基础悬停，再练习前后左右移动。", answer: "悬停" },
+        { text: "螺旋桨出现轻微磕碰缺口，______继续使用，需立即更换。", answer: "禁止" },
+        { text: "电机运转出现异响、抖动，大概率是内部______磨损或进杂物。", answer: "轴承" },
+        { text: "电调发烫严重，首先检查是否______、负载过大。", answer: "电机堵转" },
+        { text: "无人机图传画面花屏、卡顿，优先检查图传天线和______接线。", answer: "图传模块" },
+        { text: "多机同时作业时，需错开遥控与图传______，防止信号互相干扰。", answer: "频段" },
+        { text: "按照法规，商用无人机作业必须提前申请______与飞行许可。", answer: "无人机实名登记" },
+        { text: "无人机作业现场，需安排专人进行______，提醒无关人员远离。", answer: "现场警戒" },
+        { text: "收到航空航行通告（NOTAM）临时禁飞通知，需______飞行计划。", answer: "取消/调整" },
+        { text: "重量小于 250g 的微型无人机，多数国家豁免强制______要求。", answer: "实名登记" },
+        { text: "无人机搭载重载设备后，会缩短______，需提前规划返航点。", answer: "续航时间" },
+        { text: "折叠式无人机收纳时，务必锁好机臂，防止运输中______。", answer: "展开" },
+        { text: "3D 打印无人机配件适合原型制作，缺点是______偏弱，不适合高强度作业。", answer: "结构强度" },
+        { text: "无人机使用松香焊锡焊接后，残留助焊剂需清理，避免______电路。", answer: "腐蚀" },
+        { text: "万用表测量高压电路时，严禁单手操作，防止发生______事故。", answer: "触电" },
+        { text: "无人机导线过长会增加电阻，造成______损耗，影响动力输出。", answer: "电压/功率" },
+        { text: "无人机串接多段导线时，必须选用______线规，避免载流不足。", answer: "相同" },
+        { text: "短路保护器的作用是电路过载、短路时自动______电源，保护配件。", answer: "切断" },
+        { text: "无人机整套系统调试完成后，需进行______试飞，确认各项功能正常。", answer: "空载地面/低空" }
+    ];
+
+    const choiceData = [
+        { text: "飞行前检查锂电池，出现以下哪种情况绝对禁止使用？", options: ["表面轻微划痕","电池鼓包、漏液","电量剩余60%","外壳轻微磨损"], correct: "B" },
+        { text: "民用无人机常规安全飞行高度上限为？", options: ["80米","120米","150米","200米"], correct: "B" },
+        { text: "四旋翼螺旋桨装反，最直接的现象是？", options: ["飞行变慢","起飞直接侧翻","续航缩短","图传卡顿"], correct: "B" },
+        { text: "无风环境下无人机持续向左漂移，优先校准哪个传感器？", options: ["GPS","陀螺仪","激光雷达","气压计"], correct: "B" },
+        { text: "锂聚合物电池长期存放，最佳电量是？", options: ["100%满电","50%左右","10%亏电","任意电量"], correct: "B" },
+        { text: "无人机充电时，以下操作正确的是？", options: ["无人值守通宵充电","放在沙发上充电","专人值守、使用防火袋","靠近热源充电"], correct: "C" },
+        { text: "普通消费级无人机与人群的安全作业距离至少保持？", options: ["5米","30米","1米","10米"], correct: "B" },
+        { text: "以下哪个区域属于无人机禁飞区？", options: ["郊外农田","机场周边","空旷广场","野外山林"], correct: "B" },
+        { text: "无人机信号失联，默认触发的功能是？", options: ["原地降落","自动返航","继续向前飞","空中悬停"], correct: "B" },
+        { text: "室内无GPS环境飞行，应开启哪种模式？", options: ["定点模式","光流模式","航点模式","自动巡航"], correct: "B" },
+        { text: "电调选型时，电流需比电机最大电流预留多少余量？", options: ["10%以内","20%~50%","无需余量","5%"], correct: "B" },
+        { text: "2216 920KV电机，数字22代表？", options: ["电机总长度","定子宽度(mm)","电机重量","最大电流"], correct: "B" },
+        { text: "大尺寸螺旋桨适配哪种KV值电机？", options: ["高KV","低KV","无要求","超高KV"], correct: "B" },
+        { text: "六旋翼无人机相比四旋翼的核心优势是？", options: ["重量更轻","动力冗余，单电机故障可迫降","续航更长","成本更低"], correct: "B" },
+        { text: "无人机云台画面持续抖动，优先检查？", options: ["电机","云台减震部件","飞控","遥控器"], correct: "B" },
+        { text: "电力巡检常用热成像相机，主要用来检测？", options: ["线路外观","设备高温故障点","线路长度","周边植被"], correct: "B" },
+        { text: "执行测绘任务，无人机不需要控制以下哪项？", options: ["恒定高度","恒定速度","随机变向飞行","航线规整"], correct: "C" },
+        { text: "无人机电量剩余多少时必须立即返航？", options: ["40%","20%","60%","80%"], correct: "B" },
+        { text: "无人机组装焊接，首选电烙铁功率为？", options: ["20W","60W可调温","100W以上","15W"], correct: "B" },
+        { text: "焊接后导线绝缘防护首选工具？", options: ["普通胶带","热缩管","胶水","扎带"], correct: "B" },
+        { text: "检测电路短路、通断，万用表选用哪个档位？", options: ["直流电压","通断/蜂鸣档","电阻档","交流电压"], correct: "B" },
+        { text: "无人机信号细线常规选用AWG规格为？", options: ["14AWG","28AWG","10AWG","12AWG"], correct: "B" },
+        { text: "关于AWG线规，说法正确的是？", options: ["数值越大线越粗","数值越大线越细","数值与粗细无关","仅区分颜色"], correct: "B" },
+        { text: "中小型无人机主流电源接头XT60的额定电流是？", options: ["30A","60A","10A","90A"], correct: "B" },
+        { text: "大电流无人机优先选用XT90接头，其特色功能是？", options: ["防水","防火花","小型化","免焊接"], correct: "B" },
+        { text: "无人机布线基本原则，动力线与信号线需要？", options: ["捆绑在一起","分开走线防干扰","交叉缠绕","随意布置"], correct: "B" },
+        { text: "电机螺丝防松，应使用哪种辅料？", options: ["胶水","螺纹防松胶","胶带","扎带"], correct: "B" },
+        { text: "碳纤维机架的主要缺点是？", options: ["重量大","脆性大、易断裂","强度低","散热差"], correct: "B" },
+        { text: "入门消费级无人机最常用机架材料是？", options: ["纯钛","铝合金","石墨烯","陶瓷"], correct: "B" },
+        { text: "固定翼无人机无法完成以下哪个动作？", options: ["长距离平飞","原地垂直起降","高空巡航","测绘作业"], correct: "B" },
+        { text: "固定翼VTOL无人机最大优势是？", options: ["只能悬停","垂直起降+长距离平飞","成本极低","操控最简单"], correct: "B" },
+        { text: "单旋翼无人机（类直升机）最大安全隐患是？", options: ["续航短","高速主桨危险性高","载重小","速度慢"], correct: "B" },
+        { text: "遥控器左摇杆主要控制？", options: ["俯仰+横滚","油门+偏航","仅俯仰","仅横滚"], correct: "B" },
+        { text: "推动右摇杆向前，无人机动作是？", options: ["向前俯仰飞行","原地旋转","上升","向左横移"], correct: "A" },
+        { text: "无人机稳定悬停时，升力与哪个力平衡？", options: ["阻力","重力","推力","风力"], correct: "B" },
+        { text: "为减小风阻，无人机机身设计采用？", options: ["棱角造型","流线型","平面方块","凸起结构"], correct: "B" },
+        { text: "无人机设计第一原则是？", options: ["越重越好","轻量化+结构稳固","体积越大越好","外观花哨"], correct: "B" },
+        { text: "机身重心严重偏左，会导致？", options: ["续航增加","悬停困难、向左倾斜","图传清晰","电机静音"], correct: "B" },
+        { text: "组装无人机时，电池最佳安装位置是？", options: ["机臂末端","机身中心","机头","机尾"], correct: "B" },
+        { text: "无人机夜间飞行必备设备是？", options: ["拍照补光灯","防撞频闪灯","喇叭","额外电池"], correct: "B" },
+        { text: "飞行中遇到突发强风，正确操作是？", options: ["猛推油门全速对抗","降低速度、平稳操控","原地猛打方向","立即高空俯冲"], correct: "B" },
+        { text: "无人机紧急迫降地点优先选择？", options: ["人群密集区","空旷无人区域","马路中央","楼顶边缘"], correct: "B" },
+        { text: "农业植保无人机作业，不需要检查？", options: ["药箱密封性","喷洒喷头","地面行人鞋子","电池状态"], correct: "C" },
+        { text: "植保无人机喷洒药液时，飞行高度要求是？", options: ["越高越好","适中，保证药液喷洒均匀","贴地飞行","无要求"], correct: "B" },
+        { text: "无人机每日作业完成后，首要维护工作是？", options: ["立即充电","清洁机身、镜头与螺旋桨","升级固件","拆解整机"], correct: "B" },
+        { text: "无人机长期存放，错误操作是？", options: ["拆下电池","阴凉干燥存放","满电存放数月","收纳螺旋桨"], correct: "C" },
+        { text: "固件升级中断，最可能导致？", options: ["续航变长","飞控变砖、无法启动","信号增强","画质提升"], correct: "B" },
+        { text: "航点自主飞行属于？", options: ["手动模式","自动飞行模式","特技模式","偏航模式"], correct: "B" },
+        { text: "新手练习无人机，首选场地是？", options: ["闹市区","室内/空旷无人场地","高速公路旁","机场周边"], correct: "B" },
+        { text: "无人机新手训练的第一个科目是？", options: ["高速飞行","基础悬停","特技翻转","远距离飞行"], correct: "B" },
+        { text: "螺旋桨出现小缺口、裂纹，正确做法是？", options: ["继续使用","立即更换","用胶带缠绕继续飞","打磨后使用"], correct: "B" },
+        { text: "电机运转异响、抖动，故障原因大概率是？", options: ["电池没电","轴承损坏/进杂物","飞控故障","图传故障"], correct: "B" },
+        { text: "电调持续高温，排查方向错误的是？", options: ["检查电机是否堵转","检查负载是否过大","直接加大油门飞行","检查散热"], correct: "C" },
+        { text: "无人机图传花屏、卡顿，优先检查？", options: ["螺旋桨","图传天线与接线","电池容量","机架"], correct: "B" },
+        { text: "多台无人机同时作业，为防信号干扰需要？", options: ["统一频段","错开遥控/图传频段","关闭天线","增大音量"], correct: "B" },
+        { text: "商用无人机开展作业前，必须办理？", options: ["购物发票","实名登记+飞行许可","驾驶证","健康证"], correct: "B" },
+        { text: "无人机作业现场，必备安全措施是？", options: ["播放音乐","专人现场警戒","摆放广告牌","搭建舞台"], correct: "B" },
+        { text: "收到临时禁飞通告（NOTAM），应？", options: ["照常飞行","取消/调整飞行计划","低空偷飞","无视通告"], correct: "B" },
+        { text: "重量＜250g的微型无人机，多数国家豁免？", options: ["实名登记","飞行安全规则","目视飞行要求","限高规则"], correct: "A" },
+        { text: "无人机搭载重载设备后，变化最明显的是？", options: ["信号变强","续航缩短","画质提升","重量变轻"], correct: "B" },
+        { text: "折叠无人机运输前，关键操作是？", options: ["展开机臂","锁紧折叠机臂","拆下镜头","清空内存"], correct: "B" },
+        { text: "3D打印无人机配件的短板是？", options: ["精度高","结构强度不足","成型快","可定制"], correct: "B" },
+        { text: "松香焊锡残留不清理，会造成？", options: ["信号增强","电路腐蚀/接触不良","散热变好","外观美观"], correct: "B" },
+        { text: "万用表测量高压电路，禁止？", options: ["双手操作","单手操作","佩戴手套","目视表盘"], correct: "B" },
+        { text: "导线过长会直接造成？", options: ["电阻增大、电压损耗","信号变强","重量减轻","散热变好"], correct: "A" },
+        { text: "拼接多段导线时，必须保证？", options: ["线规相同","颜色一致","长度一致","品牌一致"], correct: "A" },
+        { text: "短路保护器的核心作用是？", options: ["放大信号","过载/短路时切断电源","提升电压","增加续航"], correct: "B" },
+        { text: "无人机整机调试后，必须进行？", options: ["高空极限飞行","低空空载试飞","满载极限飞行","拆解检查"], correct: "B" },
+        { text: "按照目视飞行规则（VLOS），无人机必须？", options: ["飞出视线外","保持在操作员视线内","夜间盲飞","远距离超视距"], correct: "B" },
+        { text: "以下哪种天气严禁无人机起飞？", options: ["微风晴天","雷雨大雾","多云","清晨无风"], correct: "B" },
+        { text: "无人机'BVLOS'指的是？", options: ["目视飞行","超视距飞行","室内飞行","手动飞行"], correct: "B" },
+        { text: "城市空中交通（UAM）主要应用于？", options: ["航拍","载人飞行/空中通勤","农业喷洒","测绘"], correct: "B" },
+        { text: "无人机群协同作业，主要优势是？", options: ["操控简单","大面积同步作业","单机续航变长","信号更强"], correct: "B" },
+        { text: "无人机电池'C值'代表？", options: ["电压","放电能力","容量","重量"], correct: "B" },
+        { text: "4S锂聚合物电池标准空载电压约为？", options: ["3.7V","14.8V","7.4V","22.2V"], correct: "B" },
+        { text: "镍镉电池典型缺陷是？", options: ["重量轻","记忆效应","价格低","耐低温"], correct: "B" },
+        { text: "无人机气压计主要用来检测？", options: ["水平位置","飞行高度","风向","障碍物"], correct: "B" },
+        { text: "无人机超声波传感器多用于？", options: ["远距离测绘","近距离避障/定高","热成像","信号传输"], correct: "B" },
+        { text: "IMU（惯性测量单元）不包含以下哪种传感器？", options: ["陀螺仪","加速度计","相机","磁力计"], correct: "C" },
+        { text: "无人机地面站主流软件是？", options: ["Word","Mission Planner","播放器","浏览器"], correct: "B" },
+        { text: "遥控器与无人机配对的专业术语是？", options: ["联网","对频/绑定","升级","格式化"], correct: "B" },
+        { text: "ExpressLRS属于哪类协议？", options: ["无线电链路协议","视频协议","充电协议","存储协议"], correct: "A" },
+        { text: "无人机'马桶效应'（飞行画圈），主要原因是？", options: ["动力不足","电磁干扰/传感器偏差","电量充足","画质太好"], correct: "B" },
+        { text: "以下哪种不属于无人机有效载荷？", options: ["相机","药液箱","机架","激光雷达"], correct: "C" },
+        { text: "无人机巡检高压线路，优先选用？", options: ["普通RGB相机","热成像相机","玩具摄像头","自拍杆"], correct: "B" },
+        { text: "折叠螺旋桨的主要作用是？", options: ["提升推力","缩小体积、方便收纳","增加续航","提升速度"], correct: "B" },
+        { text: "自紧式螺旋桨的优势是？", options: ["免工具快速拆装","强度翻倍","重量减半","静音效果好"], correct: "A" },
+        { text: "可变螺距螺旋桨多用于？", options: ["玩具无人机","专业工业无人机","室内迷你机","竞速机"], correct: "B" },
+        { text: "无人机焊接选用焊锡，首选类型是？", options: ["无松香无铅焊锡","普通铁丝","铜丝","铝丝"], correct: "A" },
+        { text: "焊接作业防护用品不包括？", options: ["护目镜","耐高温手套","高跟鞋","通风设备"], correct: "C" },
+        { text: "无人机机架采用空心结构，目的是？", options: ["增加重量","减重同时保证强度","美观","容纳杂物"], correct: "B" },
+        { text: "四旋翼X型布局的优势是？", options: ["操控均衡、稳定性强","载重最大","速度最快","成本最低"], correct: "A" },
+        { text: "无人机起飞前电机测试，目的是？", options: ["校准电机转向","提升电量","增强信号","清洁电机"], correct: "A" },
+        { text: "以下哪项不属于无人机飞行四大基础力？", options: ["升力","重力","磁力","阻力"], correct: "C" },
+        { text: "多旋翼无人机最大短板是？", options: ["操控简单","续航普遍偏短","稳定性强","可悬停"], correct: "B" },
+        { text: "竞速无人机设计重点是？", options: ["载重","速度与机动性","续航","航拍画质"], correct: "B" },
+        { text: "高空长航时（HALE）无人机主要用于？", options: ["室内娱乐","长期高空侦察/监测","农业喷洒","短途航拍"], correct: "B" },
+        { text: "无人机电池使用后，正确操作是？", options: ["立即充电","自然冷却后再充电","泡水降温","暴晒降温"], correct: "B" },
+        { text: "无人机飞行日志的作用是？", options: ["娱乐查看","故障复盘、数据分析","存储照片","播放视频"], correct: "B" },
+        { text: "商用无人机定期维保的目的是？", options: ["应付检查","排查隐患、延长设备寿命","改变外观","升级款式"], correct: "B" }
+    ];
+
+    // --------------------------------------------------------------
+    // 应用状态
+    // --------------------------------------------------------------
+    let currentMode = 'fill';     // 'fill' 或 'choice'
+    let currentIndex = 0;         // 当前题目索引 (0-based)
+    let score = 0;               // 当前模式得分
+
+    // 存储每个题目是否答对 (null=未答, true=正确, false=错误)
+    let fillResults = new Array(fillBlankData.length).fill(null);
+    let choiceResults = new Array(choiceData.length).fill(null);
+
+    // DOM 元素
+    const questionCard = document.getElementById('questionCard');
+    const currentNumSpan = document.getElementById('currentNum');
+    const totalNumSpan = document.getElementById('totalNum');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const totalScoreNum = document.getElementById('totalScoreNum');
+
+    // --------------------------------------------------------------
+    // 核心渲染函数
+    // --------------------------------------------------------------
+    function render() {
+        const data = currentMode === 'fill' ? fillBlankData : choiceData;
+        const results = currentMode === 'fill' ? fillResults : choiceResults;
+        const total = data.length;
+
+        // 更新进度
+        currentNumSpan.textContent = currentIndex + 1;
+        totalNumSpan.textContent = total;
+        totalScoreNum.textContent = total;
+
+        // 计算得分
+        const correctCount = results.filter(r => r === true).length;
+        score = correctCount;
+        scoreDisplay.textContent = score;
+
+        // 如果已完成所有题目（索引越界）
+        if (currentIndex >= total) {
+            questionCard.innerHTML = `
+                <div class="complete-msg">
+                    🎉 恭喜你完成所有 ${currentMode === 'fill' ? '填空' : '选择'} 题目！<br>
+                    得分：${score} / ${total}
+                </div>
+            `;
+            return;
+        }
+
+        const item = data[currentIndex];
+        const isAnswered = results[currentIndex] !== null;
+        const isCorrect = results[currentIndex] === true;
+
+        // 构建题目
+        let html = '';
+
+        // 题目标题
+        const modeName = currentMode === 'fill' ? '填空题' : '选择题';
+        html += `<div class="q-header">
+                    <span class="q-type">${modeName}</span>
+                    <span class="q-number">第 ${currentIndex+1} / ${total} 题</span>
+                </div>`;
+
+        // 题目文本
+        html += `<div class="q-text">${item.text}</div>`;
+
+        if (currentMode === 'fill') {
+            // 填空：将 ______ 替换为输入框
+            const parts = item.text.split(/______/g);
+            let inputHtml = '';
+            for (let i = 0; i < parts.length; i++) {
+                inputHtml += parts[i];
+                if (i < parts.length - 1) {
+                    const disabled = isAnswered ? 'disabled' : '';
+                    const value = isAnswered ? (isCorrect ? item.answer : '') : '';
+                    inputHtml += `<input type="text" class="blank-input" id="fillInput" ${disabled} value="${value}" placeholder="输入答案">`;
+                }
+            }
+            html += `<div style="margin: 8px 0 12px;">${inputHtml}</div>`;
+        } else {
+            // 选择题
+            const letters = ['A','B','C','D'];
+            html += `<div class="options">`;
+            item.options.forEach((opt, idx) => {
+                const letter = letters[idx];
+                const selected = isAnswered && item.correct === letter ? 'selected' : '';
+                const disabled = isAnswered ? 'disabled-opt' : '';
+                const checked = isAnswered && item.correct === letter ? 'checked' : '';
+                html += `<label class="option-label ${disabled} ${selected}" data-opt-val="${letter}">
+                            <input type="radio" name="choice" value="${letter}" ${checked} ${isAnswered ? 'disabled' : ''}>
+                            <span class="option-letter">${letter}.</span> ${opt}
+                        </label>`;
+            });
+            html += `</div>`;
+        }
+
+        // 反馈区域
+        let feedbackHtml = '';
+        if (isAnswered) {
+            if (isCorrect) {
+                feedbackHtml = `<div class="feedback-box feedback-correct">✅ 回答正确！</div>`;
+            } else {
+                const correctAns = currentMode === 'fill' ? item.answer : `${item.correct}. ${item.options[item.correct.charCodeAt(0)-65]}`;
+                feedbackHtml = `<div class="feedback-box feedback-wrong">❌ 错误 · 正确答案：${correctAns}</div>`;
+            }
+        } else {
+            feedbackHtml = `<div class="feedback-box feedback-idle">⏳ 请作答后点击「检查答案」</div>`;
+        }
+
+        // 导航按钮区域
+        const prevDisabled = currentIndex === 0;
+        const nextDisabled = !isAnswered || currentIndex === total - 1;
+        const checkDisabled = isAnswered || currentMode === 'choice'; // 选择题自动判，填空需要手动检查
+
+        html += `<div class="action-area">
+                    <div class="feedback-box" style="flex:2; min-width:150px;">${feedbackHtml}</div>
+                    <div class="nav-group">
+                        <button class="btn-nav secondary" id="prevBtn" ${prevDisabled ? 'disabled' : ''}>⬅️ 上一题</button>
+                        ${currentMode === 'fill' ? `<button class="btn-check" id="checkBtn" ${checkDisabled ? 'disabled' : ''}>🔍 检查答案</button>` : ''}
+                        <button class="btn-nav" id="nextBtn" ${nextDisabled ? 'disabled' : ''}>➡️ 下一题</button>
+                    </div>
+                </div>`;
+
+        questionCard.innerHTML = html;
+
+        // ---------- 事件绑定 ----------
+        // 填空题：检查答案按钮
+        if (currentMode === 'fill') {
+            const checkBtn = document.getElementById('checkBtn');
+            const input = document.getElementById('fillInput');
+            if (checkBtn && input) {
+                checkBtn.addEventListener('click', function() {
+                    if (results[currentIndex] !== null) return; // 已答
+                    const userVal = input.value.trim();
+                    if (userVal === '') {
+                        alert('请先输入答案再检查！');
+                        return;
+                    }
+                    const isCorrect = isFillAnswerMatch(userVal, item.answer);
+                    results[currentIndex] = isCorrect;
+                    // 禁用输入
+                    input.disabled = true;
+                    // 更新反馈
+                    const fbBox = document.querySelector('.feedback-box');
+                    if (fbBox) {
+                        if (isCorrect) {
+                            fbBox.className = 'feedback-box feedback-correct';
+                            fbBox.textContent = '✅ 回答正确！';
+                        } else {
+                            fbBox.className = 'feedback-box feedback-wrong';
+                            fbBox.textContent = `❌ 错误 · 正确答案：${item.answer}`;
+                        }
+                    }
+                    // 更新得分
+                    const correctCount = results.filter(r => r === true).length;
+                    scoreDisplay.textContent = correctCount;
+                    // 启用下一题
+                    const nextBtn = document.getElementById('nextBtn');
+                    if (nextBtn) nextBtn.disabled = false;
+                    // 禁用检查按钮
+                    this.disabled = true;
+                });
+            }
+        }
+
+        // 选择题：点击选项自动判题
+        if (currentMode === 'choice' && !isAnswered) {
+            const radios = document.querySelectorAll('input[name="choice"]');
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (results[currentIndex] !== null) return;
+                    const val = this.value;
+                    const isCorrect = (val === item.correct);
+                    results[currentIndex] = isCorrect;
+                    // 禁用所有选项
+                    document.querySelectorAll('.option-label').forEach(lb => {
+                        lb.classList.add('disabled-opt');
+                        lb.querySelector('input').disabled = true;
+                    });
+                    // 高亮正确答案
+                    document.querySelectorAll('.option-label').forEach(lb => {
+                        const radioVal = lb.querySelector('input').value;
+                        if (radioVal === item.correct) {
+                            lb.classList.add('selected');
+                        }
+                    });
+                    // 更新反馈
+                    const fbBox = document.querySelector('.feedback-box');
+                    if (fbBox) {
+                        if (isCorrect) {
+                            fbBox.className = 'feedback-box feedback-correct';
+                            fbBox.textContent = '✅ 回答正确！';
+                        } else {
+                            const correctAns = `${item.correct}. ${item.options[item.correct.charCodeAt(0)-65]}`;
+                            fbBox.className = 'feedback-box feedback-wrong';
+                            fbBox.textContent = `❌ 错误 · 正确答案：${correctAns}`;
+                        }
+                    }
+                    // 更新得分
+                    const correctCount = results.filter(r => r === true).length;
+                    scoreDisplay.textContent = correctCount;
+                    // 启用下一题
+                    const nextBtn = document.getElementById('nextBtn');
+                    if (nextBtn) nextBtn.disabled = false;
+                });
+            });
+        }
+
+        // 上一题
+        const prevBtn = document.getElementById('prevBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    render();
+                }
+            });
+        }
+
+        // 下一题
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                if (this.disabled) return;
+                if (currentIndex < data.length - 1) {
+                    currentIndex++;
+                    render();
+                }
+            });
+        }
+
+        // 如果已经回答，确保下一题可用
+        if (isAnswered) {
+            const nextBtn2 = document.getElementById('nextBtn');
+            if (nextBtn2) nextBtn2.disabled = (currentIndex === data.length - 1);
+        }
+    }
+
+    // 辅助：填空答案匹配（与文档一致）
+    function isFillAnswerMatch(user, std) {
+        let u = user.trim().toLowerCase().replace(/[％%]/g, '').replace(/[，,]/g, ',');
+        let s = std.toLowerCase().replace(/[％%]/g, '').replace(/[，,]/g, ',');
+        if (u === s) return true;
+        if (s.includes('/')) {
+            return s.split('/').some(part => part === u);
+        }
+        if (s === "20%~50%" && /^20%?~50%?$/.test(u)) return true;
+        return false;
+    }
+
+    // 切换模式
+    function switchMode(mode) {
+        if (mode === currentMode) return;
+        currentMode = mode;
+        currentIndex = 0;
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+        render();
+    }
+
+    // 重置当前模式
+    function resetCurrentMode() {
+        const results = currentMode === 'fill' ? fillResults : choiceResults;
+        results.fill(null);
+        currentIndex = 0;
+        render();
+    }
+
+    // 重置全部
+    function resetAll() {
+        fillResults.fill(null);
+        choiceResults.fill(null);
+        currentIndex = 0;
+        render();
+    }
+
+    // --------------------------------------------------------------
+    // 初始化事件绑定
+    // --------------------------------------------------------------
+    document.getElementById('modeFillBtn').addEventListener('click', () => switchMode('fill'));
+    document.getElementById('modeChoiceBtn').addEventListener('click', () => switchMode('choice'));
+    document.getElementById('resetModeBtn').addEventListener('click', resetCurrentMode);
+    document.getElementById('resetAllBtn').addEventListener('click', resetAll);
+
+    // 初次渲染
+    render();
+</script>
+</body>
+</html>
